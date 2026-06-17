@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Generador de Rutina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0A0A0A;
+      --surf:    #141414;
+      --card:    #1C1C1C;
+      --border:  #272727;
+      --acid:    #E8FF47;
+      --acid2:   #47FFCB;
+      --acid3:   #B447FF;
+      --text:    #F2F2F2;
+      --muted:   #7A7A7A;
+      --green:   #4ADE80;
+      --yellow:  #FBBF24;
+      --red:     #F87171;
+      --r:       10px;
+      --safe-b:  env(safe-area-inset-bottom, 0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .top-bar {
+      padding: 20px 20px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .session-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--bg);
+      background: var(--accent-color, var(--acid));
+      padding: 3px 10px;
+      border-radius: 20px;
+      transition: background 0.4s ease;
+    }
+
+    /* ── PROFILE STRIP ── */
+    .profile-strip {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px 0;
+      flex-wrap: wrap;
+    }
+    .pchip {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 9px;
+      white-space: nowrap;
+    }
+    .pchip strong { color: var(--text); }
+
+    /* ── IDLE STATE ── */
+    #idle {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px calc(40px + var(--safe-b));
+      text-align: center;
+      gap: 12px;
+    }
+    .idle-icon {
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .idle-h {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 8vw, 44px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+    }
+    .idle-h span { color: var(--acid); }
+    .idle-sub {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    /* ── GENERATE BUTTON ── */
+    .btn-gen {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      padding: 18px 24px;
+      background: var(--acid);
+      color: #000;
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.12s, opacity 0.12s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-gen:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-icon { font-size: 20px; }
+
+    /* ripple */
+    .btn-gen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.08);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-gen:active::after { opacity: 1; }
+
+    /* ── LOADING STATE ── */
+    #loading {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--acid);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── ROUTINE STATE ── */
+    #routine {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      padding-bottom: calc(88px + var(--safe-b));
+    }
+
+    .routine-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .routine-date {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .routine-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .routine-title span {
+      color: var(--accent-color, var(--acid));
+    }
+    .routine-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── EXERCISE LIST ── */
+    .ex-list {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .group-row {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent-color, var(--acid));
+      opacity: 0.7;
+      padding: 6px 0 2px;
+    }
+    .group-row:first-child { padding-top: 0; }
+
+    .ex-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 14px 12px;
+      animation: slideIn 0.3s ease both;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ex-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ex-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      flex: 1;
+    }
+    .ex-muscle {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent-color, var(--acid));
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ex-params {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .param {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+    .p-sets  { background: rgba(232,255,71,0.1);  color: #E8FF47; border: 1px solid rgba(232,255,71,0.2); }
+    .p-reps  { background: rgba(74,222,128,0.1);  color: #4ADE80; border: 1px solid rgba(74,222,128,0.2); }
+    .p-rest  { background: rgba(148,163,184,0.08);color: #94A3B8; border: 1px solid rgba(148,163,184,0.12); }
+
+    .weight-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .weight-cell {
+      flex: 1;
+      padding: 9px 12px;
+      border-right: 1px solid var(--border);
+    }
+    .weight-cell:last-child { border-right: none; }
+    .wc-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .wc-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .wc-val.accent { color: var(--accent-color, var(--acid)); }
+
+    .ex-tip {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-left: 9px;
+      border-left: 2px solid var(--border);
+    }
+
+    /* ── DONE BUTTON ── */
+    .done-wrap {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 20px calc(12px + var(--safe-b));
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+    .btn-new {
+      flex: 1;
+      padding: 15px;
+      background: var(--acid);
+      color: #000;
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .btn-new:active { transform: scale(0.97); opacity: 0.88; }
+    .btn-done {
+      padding: 15px 20px;
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-done:active { background: var(--border); }
+
+    /* ── WEEK SELECTOR ── */
+    .week-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surf);
+    }
+    .week-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .week-label strong {
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+    }
+    .week-btns { display: flex; gap: 6px; align-items: center; }
+    .wbtn {
+      width: 30px; height: 30px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wbtn:active { background: var(--border); }
+
+    /* ── PROGRESS BAR ── */
+    .prog-strip {
+      padding: 8px 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .prog-track {
+      flex: 1; height: 3px;
+      background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: var(--accent-color, var(--acid));
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    .prog-text {
+      font-size: 11px; font-weight: 600;
+      color: var(--accent-color, var(--acid));
+      min-width: 30px; text-align: right;
+    }
+
+    /* ── SUMMARY CARD ── */
+    .summary-card {
+      margin: 12px 16px 0;
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      display: flex;
+      gap: 0;
+    }
+    .sum-col {
+      flex: 1;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      padding: 0 8px;
+    }
+    .sum-col:first-child { padding-left: 0; }
+    .sum-col:last-child { border-right: none; padding-right: 0; }
+    .sum-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--accent-color, var(--acid));
+      line-height: 1;
+    }
+    .sum-lbl {
+      font-size: 9px; font-weight: 600;
+      color: var(--muted); letter-spacing: 1px;
+      text-transform: uppercase; margin-top: 3px;
+    }
+
+    @media (min-width: 600px) {
+      #idle, .ex-list, .routine-header, .week-row, .prog-strip,
+      .summary-card, .done-wrap { max-width: 540px; margin-left: auto; margin-right: auto; }
+      .done-wrap { left: 50%; transform: translateX(-50%); width: 540px; border-radius: var(--r) var(--r) 0 0; }
+      .top-bar, .profile-strip { max-width: 540px; margin-left: auto; margin-right: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span class="logo">Forja</span>
+  <span class="session-badge" id="sessionBadge">Sesión 1</span>
+</div>
+
+<!-- PROFILE CHIPS -->
+<div class="profile-strip">
+  <span class="pchip">⚖️ <strong>97.5 kg</strong></span>
+  <span class="pchip">📏 <strong>180 cm</strong></span>
+  <span class="pchip">🔥 <strong>30.2% grasa</strong></span>
+  <span class="pchip">💪 <strong>35.5% músculo</strong></span>
+  <span class="pchip">🎯 Objetivo: <strong>90 kg</strong></span>
+</div>
+
+<!-- ── IDLE ── -->
+<div id="idle">
+  <div class="idle-icon">🏋️</div>
+  <h1 class="idle-h">Tu rutina<br><span>del día.</span></h1>
+  <p class="idle-sub">Cada sesión cubre todos los grupos musculares con pesos calibrados a tu perfil y objetivo.</p>
+  <button class="btn-gen" id="btnGenerate" onclick="generateRoutine()">
+    <span class="btn-icon">⚡</span>
+    Generar rutina
+  </button>
+</div>
+
+<!-- ── LOADING ── -->
+<div id="loading">
+  <div class="spinner"></div>
+  <span class="loading-text" id="loadingText">Calculando...</span>
+</div>
+
+<!-- ── ROUTINE ── -->
+<div id="routine">
+
+  <!-- Week selector -->
+  <div class="week-row" id="weekRow">
+    <span class="week-label">Semana <strong id="weekLabel">1</strong> de 12</span>
+    <div class="week-btns">
+      <div class="wbtn" onclick="changeWeek(-1)">&#8249;</div>
+      <div class="wbtn" onclick="changeWeek(1)">&#8250;</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-strip">
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <span class="prog-text" id="progText">0%</span>
+  </div>
+
+  <!-- Routine header -->
+  <div class="routine-header">
+    <div class="routine-date" id="routineDate"></div>
+    <div class="routine-title" id="routineTitle"></div>
+    <div class="routine-meta" id="routineMeta"></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-card">
+    <div class="sum-col"><div class="sum-val" id="sumExercises">—</div><div class="sum-lbl">Ejercicios</div></div>
+    <div class="sum-col"><div class="sum-val" id="sumSets">—</div><div class="sum-lbl">Series tot.</div></div>
+    <div class="sum-col"><div class="sum-val" id="sumTime">—</div><div class="sum-lbl">Min. est.</div></div>
+    <div class="sum-col"><div class="sum-val" id="sumGroups">6</div><div class="sum-lbl">Grupos</div></div>
+  </div>
+
+  <!-- Exercise cards -->
+  <div class="ex-list" id="exList"></div>
+
+  <!-- Fixed bottom bar -->
+  <div class="done-wrap">
+    <button class="btn-new" onclick="generateRoutine()">⚡ Nueva rutina</button>
+    <button class="btn-done" onclick="markDone()">✓ Hecho</button>
+  </div>
+
+</div><!-- #routine -->
+
+<script>
+// ─────────────────────────────────────────────
+// USER PROFILE
+// ─────────────────────────────────────────────
+const PROFILE = {
+  weight: 97.5,
+  height: 180,
+  fatPct: 30.2,
+  musclePct: 35.5,
+  // Lean mass = 97.5 * (1 - 0.302) = ~68 kg
+  leanMass: 97.5 * (1 - 0.302), // ≈ 68 kg
+  goal: 90
+};
+
+// ─────────────────────────────────────────────
+// ACCENT COLORS per session cycle (3-cycle)
+// ─────────────────────────────────────────────
+const ACCENTS = ['#E8FF47', '#47FFCB', '#C084FC'];
+const ACCENT_LABELS = ['SESIÓN A', 'SESIÓN B', 'SESIÓN C'];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let sessionCount = parseInt(localStorage.getItem('forja_session') || '0');
+let currentWeek  = parseInt(localStorage.getItem('forja_week') || '1');
+const MAX_WEEKS  = 12;
+
+// ─────────────────────────────────────────────
+// EXERCISE DATABASE
+// Each exercise has:
+//   name, muscle (group label), muscleTag (badge),
+//   sets, reps, rest (seconds),
+//   baseKg (week 1, adjusted to lean mass ~68 kg),
+//   stepKg (progression per week),
+//   tip
+// ─────────────────────────────────────────────
+const DB = {
+  // ── PIERNAS ──
+  legs: [
+    {
+      name: 'Sentadilla con Barra Alta',
+      muscle: 'Piernas',
+      muscleTag: 'Cuád · Glúteo',
+      sets: 4, reps: '5–6', rest: 180,
+      baseKg: 80, stepKg: 2.5,
+      tip: 'Baja hasta paralelo mínimo. Rodillas en línea con el pie. Talones sin despegar. Si la forma falla, baja el peso.'
+    },
+    {
+      name: 'Prensa de Piernas 45°',
+      muscle: 'Piernas',
+      muscleTag: 'Cuád · Glúteo',
+      sets: 4, reps: '8–10', rest: 150,
+      baseKg: 120, stepKg: 5,
+      tip: 'Pies a anchura de caderas. Baja lento (3 seg). No bloquees completamente las rodillas arriba.'
+    },
+    {
+      name: 'Peso Muerto Rumano',
+      muscle: 'Piernas',
+      muscleTag: 'Isquios · Glúteo',
+      sets: 4, reps: '5–6', rest: 180,
+      baseKg: 100, stepKg: 2.5,
+      tip: 'Espalda neutral siempre. Caderas atrás, barra roza las piernas. Pausa 1 seg abajo para maximizar isquios.'
+    },
+    {
+      name: 'Hip Thrust con Barra',
+      muscle: 'Piernas',
+      muscleTag: 'Glúteo mayor',
+      sets: 3, reps: '8–10', rest: 120,
+      baseKg: 80, stepKg: 2.5,
+      tip: 'Espalda apoyada en banco. Cadera al nivel del torso en el punto más alto. Aprieta el glúteo 1 seg arriba.'
+    },
+    {
+      name: 'Extensión de Cuádriceps (Máquina)',
+      muscle: 'Piernas',
+      muscleTag: 'Cuádriceps',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 40, stepKg: 2.5,
+      tip: 'Extensión completa, contrae el cuádriceps arriba. Baja controlado sin dejar caer el peso.'
+    },
+    {
+      name: 'Curl Femoral Tumbado (Máquina)',
+      muscle: 'Piernas',
+      muscleTag: 'Isquiotibiales',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 35, stepKg: 2.5,
+      tip: 'Caderas pegadas al banco. Curla hasta 90°+ y controla la bajada. Sin impulsos.'
+    },
+    {
+      name: 'Zancadas con Mancuernas',
+      muscle: 'Piernas',
+      muscleTag: 'Cuád · Glúteo',
+      sets: 3, reps: '10 c/pierna', rest: 90,
+      baseKg: 18, stepKg: 1,
+      tip: 'Paso amplio, rodilla trasera cerca del suelo. Tronco erguido. Peso por mano.',
+      perHand: true
+    },
+    {
+      name: 'Elevaciones de Talones de Pie',
+      muscle: 'Piernas',
+      muscleTag: 'Gemelos',
+      sets: 4, reps: '15–20', rest: 60,
+      baseKg: 40, stepKg: 2.5,
+      tip: 'Rango completo: baja talón lo máximo posible, sube de puntillas. Pausa 1 seg arriba.'
+    }
+  ],
+
+  // ── ESPALDA ──
+  back: [
+    {
+      name: 'Jalones al Pecho (Polea Alta)',
+      muscle: 'Espalda',
+      muscleTag: 'Dorsal ancho',
+      sets: 4, reps: '8–10', rest: 120,
+      baseKg: 55, stepKg: 2.5,
+      tip: 'Lleva la barra al esternón. Codos apuntan al suelo. Baja controlado — no dejes que la polea te suba.'
+    },
+    {
+      name: 'Remo con Barra (Pendlay)',
+      muscle: 'Espalda',
+      muscleTag: 'Dorsal · Romboides',
+      sets: 4, reps: '6–8', rest: 150,
+      baseKg: 65, stepKg: 2.5,
+      tip: 'Torso a 45°. Tira al ombligo retrayendo las escápulas. La barra parte del suelo cada rep (Pendlay).'
+    },
+    {
+      name: 'Remo con Mancuerna (1 brazo)',
+      muscle: 'Espalda',
+      muscleTag: 'Dorsal · Romboides',
+      sets: 3, reps: '8–10', rest: 90,
+      baseKg: 28, stepKg: 1,
+      tip: 'Rodilla y mano en banco. Codo hacia el techo. Controla la bajada. Peso por mano.',
+      perHand: true
+    },
+    {
+      name: 'Remo en Polea Baja (Cable)',
+      muscle: 'Espalda',
+      muscleTag: 'Dorsal · Trapecio',
+      sets: 3, reps: '10–12', rest: 90,
+      baseKg: 55, stepKg: 2.5,
+      tip: 'Espalda recta, tira hacia el ombligo. Retrae escápulas en el punto de contracción.'
+    },
+    {
+      name: 'Pullover con Mancuerna',
+      muscle: 'Espalda',
+      muscleTag: 'Dorsal · Serrato',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 18, stepKg: 1,
+      tip: 'Espalda transversal en banco. Codo ligeramente doblado. Gran estiramiento del dorsal.'
+    }
+  ],
+
+  // ── PECHO ──
+  chest: [
+    {
+      name: 'Press de Banca con Barra',
+      muscle: 'Pecho',
+      muscleTag: 'Pectoral mayor',
+      sets: 4, reps: '5–6', rest: 180,
+      baseKg: 70, stepKg: 2.5,
+      tip: 'Omóplatos retraídos, pies planos. Baja en 2–3 seg. Empuje explosivo hacia arriba.'
+    },
+    {
+      name: 'Press Inclinado con Mancuernas',
+      muscle: 'Pecho',
+      muscleTag: 'Pecho superior',
+      sets: 3, reps: '8–10', rest: 120,
+      baseKg: 26, stepKg: 1,
+      tip: 'Banco a 30–45°. Codos a 75° — no abras demasiado. Rango completo. Peso por mano.',
+      perHand: true
+    },
+    {
+      name: 'Aperturas con Cable (Pec Deck)',
+      muscle: 'Pecho',
+      muscleTag: 'Pectoral (contracción)',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 22, stepKg: 1,
+      tip: 'Leve flexión de codo fija. Cierra delante del pecho y aprieta 1 seg. Controla la apertura.'
+    },
+    {
+      name: 'Press de Banca Declinado',
+      muscle: 'Pecho',
+      muscleTag: 'Pecho inferior',
+      sets: 3, reps: '8–10', rest: 120,
+      baseKg: 72, stepKg: 2.5,
+      tip: 'Ángulo declinado ~20°. Refuerza la porción inferior del pectoral. Misma técnica que banca plana.'
+    },
+    {
+      name: 'Fondos en Paralelas (Pecho)',
+      muscle: 'Pecho',
+      muscleTag: 'Pecho · Tríceps',
+      sets: 3, reps: '8–10', rest: 120,
+      baseKg: 0, stepKg: 0,
+      tip: 'Inclínate hacia adelante para enfatizar el pecho. Si es fácil, añade lastre. Baja hasta 90° de codo.',
+      bodyweight: true
+    }
+  ],
+
+  // ── HOMBROS ──
+  shoulders: [
+    {
+      name: 'Press Militar con Barra (de pie)',
+      muscle: 'Hombros',
+      muscleTag: 'Deltoides anterior',
+      sets: 4, reps: '6–8', rest: 150,
+      baseKg: 45, stepKg: 1.25,
+      tip: 'Core apretado, sin arquear la espalda. Empuje vertical estricto. Codos ligeramente adelantados.'
+    },
+    {
+      name: 'Press Arnold con Mancuernas',
+      muscle: 'Hombros',
+      muscleTag: 'Deltoides 3 cabezas',
+      sets: 3, reps: '10–12', rest: 90,
+      baseKg: 18, stepKg: 1,
+      tip: 'Empieza con palmas hacia ti, gira al subir hasta pronación. Cubre todo el arco del deltoides.',
+      perHand: true
+    },
+    {
+      name: 'Elevaciones Laterales con Mancuernas',
+      muscle: 'Hombros',
+      muscleTag: 'Deltoides medial',
+      sets: 4, reps: '12–15', rest: 90,
+      baseKg: 10, stepKg: 0.5,
+      tip: 'Codos ligeramente doblados. Sube hasta paralelo. Baja en 3 seg. No uses impulso de cintura.',
+      perHand: true
+    },
+    {
+      name: 'Vuelos Posteriores con Mancuernas',
+      muscle: 'Hombros',
+      muscleTag: 'Deltoides posterior',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 10, stepKg: 0.5,
+      tip: 'Torso inclinado 45°. Abre los brazos como alas. El deltoides trasero equilibra los hombros.',
+      perHand: true
+    }
+  ],
+
+  // ── BÍCEPS ──
+  biceps: [
+    {
+      name: 'Curl con Barra EZ',
+      muscle: 'Bíceps',
+      muscleTag: 'Bíceps braquial',
+      sets: 3, reps: '10–12', rest: 90,
+      baseKg: 25, stepKg: 1.25,
+      tip: 'Codos fijos al cuerpo. Sube hasta 90°+ y aprieta. Baja sin soltar la tensión.'
+    },
+    {
+      name: 'Curl Martillo con Mancuernas',
+      muscle: 'Bíceps',
+      muscleTag: 'Bíceps · Braquial',
+      sets: 3, reps: '10–12', rest: 90,
+      baseKg: 16, stepKg: 1,
+      tip: 'Agarre neutro (palma hacia adentro). Activa el braquial y supinador. Alterna brazos.',
+      perHand: true
+    },
+    {
+      name: 'Curl en Polea Baja',
+      muscle: 'Bíceps',
+      muscleTag: 'Bíceps (tensión constante)',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 20, stepKg: 1.25,
+      tip: 'La polea mantiene tensión en toda la trayectoria. Ideal para volumen y bombeo.'
+    }
+  ],
+
+  // ── TRÍCEPS ──
+  triceps: [
+    {
+      name: 'Press Francés con Barra EZ',
+      muscle: 'Tríceps',
+      muscleTag: 'Cabeza larga',
+      sets: 3, reps: '8–10', rest: 90,
+      baseKg: 22, stepKg: 1.25,
+      tip: 'Codos apuntan al techo, sin abrir. Baja la barra a la frente o nuca. Extiende completamente.'
+    },
+    {
+      name: 'Extensiones en Polea Alta (Cuerda)',
+      muscle: 'Tríceps',
+      muscleTag: 'Tríceps (3 cabezas)',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 20, stepKg: 1.25,
+      tip: 'Codo fijo. Separa la cuerda al bajar para activar las 3 cabezas. Extiende completamente.'
+    },
+    {
+      name: 'Fondos en Banco (Tríceps)',
+      muscle: 'Tríceps',
+      muscleTag: 'Tríceps · Deltoides',
+      sets: 3, reps: '12–15', rest: 90,
+      baseKg: 0, stepKg: 0,
+      tip: 'Manos en banco detrás. Cuerpo erguido para aislar el tríceps. Baja hasta 90° de codo.',
+      bodyweight: true
+    }
+  ],
+
+  // ── CORE ──
+  core: [
+    {
+      name: 'Plancha Frontal Isométrica',
+      muscle: 'Core',
+      muscleTag: 'Transverso · Core',
+      sets: 3, reps: '40–50 seg', rest: 60,
+      baseKg: 0, stepKg: 0,
+      tip: 'Cuerpo recto de cabeza a talones. Aprieta glúteos y abdomen. +5 seg cada semana.',
+      timed: true
+    },
+    {
+      name: 'Crunch en Polea Alta',
+      muscle: 'Core',
+      muscleTag: 'Recto abdominal',
+      sets: 3, reps: '12–15', rest: 60,
+      baseKg: 15, stepKg: 1.25,
+      tip: 'De rodillas, cuerda en nuca. Flexiona el tronco hacia las rodillas. Aprieta abdominal.'
+    },
+    {
+      name: 'Rueda Abdominal',
+      muscle: 'Core',
+      muscleTag: 'Core completo',
+      sets: 3, reps: '8–10', rest: 75,
+      baseKg: 0, stepKg: 0,
+      tip: 'Extiende sin arquear la zona lumbar. Si no puedes mantener la forma, usa rodillas.',
+      bodyweight: true
+    },
+    {
+      name: 'Plancha Lateral',
+      muscle: 'Core',
+      muscleTag: 'Oblicuos',
+      sets: 3, reps: '30–40 seg c/lado', rest: 60,
+      baseKg: 0, stepKg: 0,
+      tip: 'Cadera elevada y alineada. Aprieta el oblicuo. Cambia de lado sin descanso.',
+      timed: true
+    },
+    {
+      name: 'Elevación de Piernas Colgado',
+      muscle: 'Core',
+      muscleTag: 'Abdomen · Flexores cadera',
+      sets: 3, reps: '10–12', rest: 75,
+      baseKg: 0, stepKg: 0,
+      tip: 'Sube piernas hasta paralelo o más. Controla la bajada. Sin balanceo.',
+      bodyweight: true
+    },
+    {
+      name: 'Pallof Press (Anti-rotación)',
+      muscle: 'Core',
+      muscleTag: 'Core funcional',
+      sets: 3, reps: '10–12 c/lado', rest: 60,
+      baseKg: 12, stepKg: 1.25,
+      tip: 'Parado lateral a la polea. Empuja y regresa sin rotar el tronco. Entrena estabilidad real.'
+    }
+  ]
+};
+
+// ─────────────────────────────────────────────
+// PICK ROUTINE
+// Selects 1–2 exercises per group ensuring full-body
+// Uses session count to rotate through the DB
+// ─────────────────────────────────────────────
+function pickRoutine(session) {
+  // Deterministic shuffle per session
+  function shuffled(arr, seed) {
+    const a = [...arr];
+    let s = seed;
+    for (let i = a.length - 1; i > 0; i--) {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      const j = Math.abs(s) % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const s = session + 1;
+
+  // Each group: how many exercises to pick
+  const picks = [
+    { key: 'legs',      n: 2 },   // 2 leg exercises per session
+    { key: 'back',      n: 2 },
+    { key: 'chest',     n: 2 },
+    { key: 'shoulders', n: 1 },
+    { key: 'biceps',    n: 1 },
+    { key: 'triceps',   n: 1 },
+    { key: 'core',      n: 1 }
+  ];
+
+  const routine = [];
+  picks.forEach(({ key, n }) => {
+    const pool = shuffled(DB[key], s * key.charCodeAt(0));
+    for (let i = 0; i < n && i < pool.length; i++) {
+      routine.push({ ...pool[i], group: key });
+    }
+  });
+
+  return routine;
+}
+
+// ─────────────────────────────────────────────
+// WEIGHT CALCULATION
+// week: 1–12, baseKg adjusted to user lean mass
+// We scale baseKg relative to a 70 kg lean mass reference
+// User lean mass ≈ 68 kg → scale factor ≈ 0.97
+// ─────────────────────────────────────────────
+const SCALE = PROFILE.leanMass / 70;  // ~0.97
+
+function calcWeight(ex, week) {
+  if (ex.bodyweight) return null;
+  if (ex.timed) return null;
+  const base = Math.round(ex.baseKg * SCALE / 2.5) * 2.5; // round to nearest 2.5
+  const total = base + ex.stepKg * (week - 1);
+  return total;
+}
+
+function fmtWeight(ex, week) {
+  const w = calcWeight(ex, week);
+  if (w === null) return '—';
+  if (ex.perHand) return w + ' kg/mano';
+  return w + ' kg';
+}
+
+function fmtNext(ex, week) {
+  if (ex.bodyweight) return 'Peso corporal';
+  if (ex.timed) return '+5 seg / sem.';
+  if (ex.stepKg === 0) return 'Técnica primero';
+  const next = calcWeight(ex, week) + ex.stepKg;
+  if (ex.perHand) return next + ' kg/mano';
+  return next + ' kg';
+}
+
+// ─────────────────────────────────────────────
+// GROUP LABELS
+// ─────────────────────────────────────────────
+const GROUP_ICONS = {
+  legs: '🦵 Piernas',
+  back: '🔙 Espalda',
+  chest: '🏋️ Pecho',
+  shoulders: '💛 Hombros',
+  biceps: '💪 Bíceps',
+  triceps: '🦾 Tríceps',
+  core: '⬛ Core'
+};
+
+// ─────────────────────────────────────────────
+// RENDER ROUTINE
+// ─────────────────────────────────────────────
+function renderRoutine(exercises, session, week) {
+  const accent = ACCENTS[session % 3];
+
+  // Set accent CSS var
+  document.documentElement.style.setProperty('--accent-color', accent);
+
+  // Session badge
+  document.getElementById('sessionBadge').textContent = 'Sesión ' + (session + 1);
+
+  // Header
+  const now = new Date();
+  const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('routineDate').textContent =
+    days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()];
+
+  const labels = ['FUERZA + VOLUMEN', 'HIPERTROFIA', 'POTENCIA + DEFINICIÓN'];
+  document.getElementById('routineTitle').innerHTML =
+    '<span>' + labels[session % 3] + '</span> · Semana ' + week;
+
+  const totalSets = exercises.reduce((s, e) => s + e.sets, 0);
+  const estMin = Math.round(totalSets * 2.5 + (exercises.length * 1.5));
+  document.getElementById('routineMeta').textContent =
+    exercises.length + ' ejercicios · ' + totalSets + ' series · ~' + estMin + ' min';
+
+  // Summary
+  document.getElementById('sumExercises').textContent = exercises.length;
+  document.getElementById('sumSets').textContent = totalSets;
+  document.getElementById('sumTime').textContent = '~' + estMin;
+  document.getElementById('sumGroups').textContent = new Set(exercises.map(e => e.group)).size;
+
+  // Progress
+  const pct = Math.round(((week - 1) / (MAX_WEEKS - 1)) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progText').textContent = pct + '%';
+  document.getElementById('weekLabel').textContent = week;
+
+  // Build exercise cards
+  const list = document.getElementById('exList');
+  list.innerHTML = '';
+
+  let lastGroup = null;
+  exercises.forEach((ex, idx) => {
+    // Group label
+    if (ex.group !== lastGroup) {
+      const gl = document.createElement('div');
+      gl.className = 'group-row';
+      gl.textContent = GROUP_ICONS[ex.group] || ex.group;
+      list.appendChild(gl);
+      lastGroup = ex.group;
+    }
+
+    const delay = idx * 0.04;
+    const w = calcWeight(ex, week);
+    const card = document.createElement('div');
+    card.className = 'ex-card';
+    card.style.animationDelay = delay + 's';
+
+    card.innerHTML = `
+      <div class="ex-top">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-muscle">${ex.muscleTag}</div>
+      </div>
+      <div class="ex-params">
+        <span class="param p-sets">${ex.sets} series</span>
+        <span class="param p-reps">${ex.reps} reps</span>
+        <span class="param p-rest">${ex.rest >= 60 ? Math.round(ex.rest/60) + ' min' : ex.rest + ' seg'} descanso</span>
+      </div>
+      <div class="weight-row">
+        <div class="weight-cell">
+          <div class="wc-label">Peso hoy</div>
+          <div class="wc-val accent">${fmtWeight(ex, week)}</div>
+        </div>
+        <div class="weight-cell">
+          <div class="wc-label">Próx. semana</div>
+          <div class="wc-val">${fmtNext(ex, week)}</div>
+        </div>
+        <div class="weight-cell">
+          <div class="wc-label">Progresión</div>
+          <div class="wc-val">${ex.stepKg > 0 ? '+' + ex.stepKg + ' kg/sem' : ex.timed ? '+5 seg/sem' : 'Corporal'}</div>
+        </div>
+      </div>
+      ${ex.tip ? `<div class="ex-tip">${ex.tip}</div>` : ''}
+    `;
+
+    list.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────────
+// LOADING MESSAGES
+// ─────────────────────────────────────────────
+const LOADING_MSGS = [
+  'Calculando tu carga óptima...',
+  'Rotando grupos musculares...',
+  'Ajustando a semana ' + currentWeek + '...',
+  'Seleccionando ejercicios...',
+  'Aplicando progresión lineal...'
+];
+
+// ─────────────────────────────────────────────
+// GENERATE
+// ─────────────────────────────────────────────
+function generateRoutine() {
+  // Switch to loading
+  show('loading');
+  let mi = 0;
+  const interval = setInterval(() => {
+    document.getElementById('loadingText').textContent =
+      LOADING_MSGS[mi % LOADING_MSGS.length];
+    mi++;
+  }, 220);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    const exercises = pickRoutine(sessionCount);
+    renderRoutine(exercises, sessionCount, currentWeek);
+    show('routine');
+  }, 900);
+}
+
+function markDone() {
+  sessionCount++;
+  localStorage.setItem('forja_session', sessionCount);
+  show('idle');
+}
+
+function show(state) {
+  document.getElementById('idle').style.display    = state === 'idle'    ? 'flex' : 'none';
+  document.getElementById('loading').style.display = state === 'loading' ? 'flex' : 'none';
+  document.getElementById('routine').style.display = state === 'routine' ? 'flex' : 'none';
+}
+
+function changeWeek(delta) {
+  currentWeek = Math.max(1, Math.min(MAX_WEEKS, currentWeek + delta));
+  localStorage.setItem('forja_week', currentWeek);
+  // Re-render with same session exercises
+  const exercises = pickRoutine(sessionCount);
+  renderRoutine(exercises, sessionCount, currentWeek);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+show('idle');
+// Set initial accent from stored session
+document.documentElement.style.setProperty(
+  '--accent-color', ACCENTS[sessionCount % 3]
+);
+document.getElementById('sessionBadge').textContent = 'Sesión ' + (sessionCount + 1);
+</script>
+</body>
+</html>
