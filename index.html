@@ -840,7 +840,7 @@ function renderRoutine(dayIdx, week) {
         <span class="wbox-unit" style="margin-left:2px">${ex.perHand ? 'kg/m' : 'kg'}</span>
         <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx})">✓</button>
       </div>
-      ${ex.tip ? `<div class="ex-tip" style="margin-top:8px">${ex.tip}</div>` : ''}
+      ${ex.tip ? '<div class="ex-tip" style="margin-top:8px">' + ex.tip + '</div>' : ''}
     `;
     list.appendChild(card);
   });
@@ -1001,9 +1001,7 @@ function renderLog() {
     tr.innerHTML = `
       <td>${entry.date}</td>
       <td><span class="log-val">${entry.weight}</span> kg
-        ${i < entries.length - 1 && delta !== 0
-          ? `<br><span class="log-delta ${cls}">${sign}${delta.toFixed(1)} kg</span>`
-          : ''}</td>
+        ${i < entries.length - 1 && delta !== 0 ? '<br><span class="log-delta ' + cls + '">' + sign + delta.toFixed(1) + ' kg</span>' : ''}</td>
       <td>${entry.fat}%</td>
       <td>${entry.muscle}%</td>
     `;
