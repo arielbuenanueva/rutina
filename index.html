@@ -17,45 +17,48 @@
       --acid:   #E8FF47;
       --text:   #F2F2F2;
       --muted:  #6A6A6A;
+      --green:  #4ADE80;
       --r:      10px;
       --safe-t: env(safe-area-inset-top, 0px);
       --safe-b: env(safe-area-inset-bottom, 0px);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'Inter', system-ui, sans-serif;
-      min-height: 100dvh;
-      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh; -webkit-font-smoothing: antialiased;
       overscroll-behavior: none;
     }
 
-    /* ══════════════════════════
-       SCREEN: HOME
-    ══════════════════════════ */
-    #screen-home {
-      display: flex;
-      flex-direction: column;
-      min-height: 100dvh;
-      padding: calc(24px + var(--safe-t)) 20px calc(24px + var(--safe-b));
-    }
+    /* ── SHARED UTILS ── */
+    .screen { display: none; flex-direction: column; min-height: 100dvh; }
+    .screen.active { display: flex; }
+
+    /* ══════════════════════════════
+       HOME SCREEN
+    ══════════════════════════════ */
+    #s-home { padding: calc(24px + var(--safe-t)) 20px calc(100px + var(--safe-b)); }
 
     .home-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 36px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 32px;
     }
     .logo {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 13px; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: var(--muted);
+      letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
     }
+    .home-actions { display: flex; gap: 8px; align-items: center; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--surf); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .icon-btn:active { background: var(--border); }
+
     .week-pill {
       display: flex; align-items: center; gap: 6px;
       background: var(--surf); border: 1px solid var(--border);
@@ -68,14 +71,13 @@
     .wp-btn {
       width: 26px; height: 26px; border-radius: 50%;
       background: var(--card); border: 1px solid var(--border);
-      color: var(--text); font-size: 14px;
+      color: var(--text); font-size: 16px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     .wp-btn:active { background: var(--border); }
 
-    .home-hero { margin-bottom: 28px; }
-
+    .home-hero { margin-bottom: 24px; }
     .home-eyebrow {
       font-size: 11px; font-weight: 600;
       letter-spacing: 2.5px; text-transform: uppercase;
@@ -84,29 +86,20 @@
     .home-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(52px, 14vw, 72px);
-      font-weight: 700; line-height: 0.92;
-      letter-spacing: -2px;
+      font-weight: 700; line-height: 0.92; letter-spacing: -2px;
     }
-    .home-title em {
-      color: var(--acid); font-style: normal;
-      display: block;
-    }
+    .home-title em { color: var(--acid); font-style: normal; display: block; }
 
-    .chips {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      margin-bottom: 24px;
-    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
     .chip {
-      font-size: 11px; font-weight: 500;
-      color: var(--muted); background: var(--surf);
-      border: 1px solid var(--border); border-radius: 6px;
-      padding: 4px 9px; white-space: nowrap;
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      background: var(--surf); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 9px; white-space: nowrap;
     }
     .chip strong { color: var(--text); }
 
     .prog-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
     }
     .prog-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
     .prog-track { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
@@ -114,44 +107,32 @@
     .prog-pct   { font-size: 11px; font-weight: 600; color: var(--acid); min-width: 28px; text-align: right; }
 
     .day-grid { display: flex; flex-direction: column; gap: 8px; }
-
     .day-btn {
       display: flex; align-items: center;
       background: var(--surf); border: 1px solid var(--border);
       border-radius: var(--r); padding: 14px 16px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
-      transition: border-color 0.15s, background 0.15s;
-      gap: 14px;
+      gap: 14px; transition: border-color 0.15s, background 0.15s;
     }
     .day-btn:active { background: var(--card); }
-    .day-btn.active {
-      border-color: var(--acid);
-      background: rgba(232,255,71,0.05);
-    }
+    .day-btn.done { border-color: var(--green); background: rgba(74,222,128,0.04); }
     .day-btn-num {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 22px; font-weight: 700;
-      color: var(--border); line-height: 1; min-width: 32px;
+      font-size: 22px; font-weight: 700; color: var(--border); line-height: 1; min-width: 32px;
     }
-    .day-btn.active .day-btn-num { color: var(--acid); }
+    .day-btn.done .day-btn-num { color: var(--green); }
     .day-btn-info { flex: 1; }
     .day-btn-name {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 700; line-height: 1; margin-bottom: 3px;
     }
     .day-btn-groups { font-size: 11px; color: var(--muted); }
-    .day-btn-arrow  { font-size: 18px; color: var(--muted); }
-    .day-btn.active .day-btn-arrow { color: var(--acid); }
+    .day-btn-status { font-size: 18px; }
 
-    /* ══════════════════════════
-       SCREEN: ROUTINE
-    ══════════════════════════ */
-    #screen-routine {
-      display: none;
-      flex-direction: column;
-      min-height: 100dvh;
-      padding-bottom: calc(80px + var(--safe-b));
-    }
+    /* ══════════════════════════════
+       ROUTINE SCREEN
+    ══════════════════════════════ */
+    #s-routine { padding-bottom: calc(80px + var(--safe-b)); }
 
     .rtn-navbar {
       position: sticky; top: 0; z-index: 50;
@@ -159,7 +140,7 @@
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: calc(14px + var(--safe-t)) 16px 14px;
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 10px;
     }
     .rtn-back {
       width: 36px; height: 36px; border-radius: 8px;
@@ -171,45 +152,62 @@
     .rtn-back:active { background: var(--border); }
     .rtn-nav-title {
       flex: 1; font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px; font-weight: 700;
+      font-size: 15px; font-weight: 700;
     }
-    .rtn-week-badge {
-      font-size: 11px; font-weight: 600;
-      color: var(--acid); background: rgba(232,255,71,0.1);
-      border: 1px solid rgba(232,255,71,0.2);
-      border-radius: 6px; padding: 3px 8px;
+    /* week selector inside routine */
+    .rtn-week-ctrl {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--surf); border: 1px solid var(--border);
+      border-radius: 8px; padding: 3px 3px 3px 8px;
     }
+    .rtn-week-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px; font-weight: 700; color: var(--acid);
+      min-width: 46px; text-align: center;
+    }
+    .rtn-wbtn {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .rtn-wbtn:active { background: var(--border); }
+
+    /* day complete banner */
+    .day-complete-banner {
+      display: none;
+      margin: 12px 16px 0;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: var(--r);
+      padding: 12px 16px;
+      align-items: center; gap: 10px;
+    }
+    .day-complete-banner.show { display: flex; }
+    .dcb-icon { font-size: 24px; }
+    .dcb-text { flex: 1; }
+    .dcb-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 700; color: var(--green);
+    }
+    .dcb-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
     .rtn-summary {
       margin: 12px 16px;
       background: var(--surf); border: 1px solid var(--border);
       border-radius: var(--r); display: flex; overflow: hidden;
     }
-    .sum-col {
-      flex: 1; text-align: center; padding: 12px 8px;
-      border-right: 1px solid var(--border);
-    }
+    .sum-col { flex: 1; text-align: center; padding: 12px 8px; border-right: 1px solid var(--border); }
     .sum-col:last-child { border-right: none; }
-    .sum-val {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px; font-weight: 700;
-      color: var(--acid); line-height: 1;
-    }
-    .sum-lbl {
-      font-size: 9px; font-weight: 600; color: var(--muted);
-      letter-spacing: 1px; text-transform: uppercase; margin-top: 3px;
-    }
+    .sum-val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: var(--acid); line-height: 1; }
+    .sum-lbl { font-size: 9px; font-weight: 600; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
 
-    .ex-list {
-      padding: 0 16px 12px;
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    .ex-list { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 8px; }
     .group-label {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 10px; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
       letter-spacing: 2.5px; text-transform: uppercase;
-      color: var(--acid); opacity: 0.65;
-      padding: 10px 0 2px;
+      color: var(--acid); opacity: 0.65; padding: 10px 0 2px;
     }
     .group-label:first-child { padding-top: 4px; }
 
@@ -217,12 +215,18 @@
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--r); padding: 14px 14px 12px;
       animation: fadeUp 0.25s ease both;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .ex-card.checked {
+      border-color: var(--green);
+      background: rgba(74,222,128,0.05);
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* checkbox row */
     .ex-top {
       display: flex; align-items: flex-start;
       justify-content: space-between; gap: 8px; margin-bottom: 8px;
@@ -231,42 +235,55 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 700; line-height: 1.2; flex: 1;
     }
-    .ex-badge {
-      font-size: 10px; font-weight: 600;
-      color: #000; background: var(--acid);
-      padding: 2px 8px; border-radius: 20px;
-      white-space: nowrap; flex-shrink: 0;
+    .ex-check {
+      width: 26px; height: 26px; border-radius: 7px;
+      border: 2px solid var(--border); background: var(--surf);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, background 0.15s;
+      font-size: 14px; color: transparent;
+    }
+    .ex-check.done {
+      border-color: var(--green); background: var(--green); color: #000;
     }
 
-    .ex-tags {
-      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;
+    .ex-badge {
+      font-size: 10px; font-weight: 600; color: #000; background: var(--acid);
+      padding: 2px 8px; border-radius: 20px; white-space: nowrap;
     }
-    .tag {
-      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
-    }
-    .t-sets { background: rgba(232,255,71,0.1);  color: #E8FF47; border: 1px solid rgba(232,255,71,0.2); }
-    .t-reps { background: rgba(74,222,128,0.1);  color: #4ADE80; border: 1px solid rgba(74,222,128,0.2); }
-    .t-rest { background: rgba(148,163,184,0.08);color: #94A3B8; border: 1px solid rgba(148,163,184,0.15); }
+    .ex-top-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+
+    .ex-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+    .t-sets { background: rgba(232,255,71,0.1); color: #E8FF47; border: 1px solid rgba(232,255,71,0.2); }
+    .t-reps { background: rgba(74,222,128,0.1); color: #4ADE80; border: 1px solid rgba(74,222,128,0.2); }
+    .t-rest { background: rgba(148,163,184,0.08); color: #94A3B8; border: 1px solid rgba(148,163,184,0.15); }
 
     .weight-box {
       background: var(--surf); border: 1px solid var(--border);
       border-radius: 8px; overflow: hidden; display: flex;
     }
-    .wbox-cell {
-      flex: 1; padding: 9px 10px;
-      border-right: 1px solid var(--border);
-    }
+    .wbox-cell { flex: 1; padding: 9px 10px; border-right: 1px solid var(--border); }
     .wbox-cell:last-child { border-right: none; }
-    .wbox-lbl {
-      font-size: 9px; font-weight: 600;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 3px;
-    }
-    .wbox-val {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px; font-weight: 700; line-height: 1;
-    }
+    .wbox-lbl { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+    .wbox-val { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; line-height: 1; }
     .wbox-val.hi { color: var(--acid); }
+    /* editable weight */
+    .wbox-edit-row { display: flex; align-items: center; gap: 4px; }
+    .wbox-input {
+      font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+      color: var(--acid); background: transparent; border: none;
+      border-bottom: 1px dashed rgba(232,255,71,0.4);
+      width: 64px; outline: none; padding: 0;
+      -webkit-appearance: none;
+    }
+    .wbox-unit { font-size: 11px; color: var(--muted); }
+    .wbox-save {
+      font-size: 10px; font-weight: 700; color: #000;
+      background: var(--acid); border: none; border-radius: 4px;
+      padding: 2px 6px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
 
     .ex-tip {
       margin-top: 8px; font-size: 11px; color: var(--muted);
@@ -278,13 +295,11 @@
       padding: 10px 16px calc(10px + var(--safe-b));
       background: rgba(10,10,10,0.95);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border);
-      display: flex; gap: 8px;
+      border-top: 1px solid var(--border); display: flex; gap: 8px;
     }
     .btn-prev, .btn-next {
       flex: 1; padding: 14px 10px; border-radius: var(--r); border: none;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       transition: transform 0.1s, opacity 0.1s;
     }
@@ -292,41 +307,120 @@
     .btn-prev { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
     .btn-next { background: var(--acid); color: #000; }
 
+    /* ══════════════════════════════
+       SETTINGS SCREEN
+    ══════════════════════════════ */
+    #s-settings {
+      padding: calc(20px + var(--safe-t)) 20px calc(40px + var(--safe-b));
+    }
+    .set-navbar {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    }
+    .set-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700; flex: 1;
+    }
+
+    .set-section {
+      background: var(--surf); border: 1px solid var(--border);
+      border-radius: var(--r); margin-bottom: 16px; overflow: hidden;
+    }
+    .set-section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted);
+      padding: 12px 16px 8px;
+    }
+    .set-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-top: 1px solid var(--border);
+    }
+    .set-row:first-of-type { border-top: none; }
+    .set-row-label { flex: 1; font-size: 13px; font-weight: 500; }
+    .set-row-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .set-input {
+      font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+      color: var(--text); background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 6px 10px; width: 90px; text-align: right;
+      outline: none; -webkit-appearance: none;
+    }
+    .set-input:focus { border-color: var(--acid); }
+    .set-unit { font-size: 12px; color: var(--muted); min-width: 22px; }
+
+    .set-save-btn {
+      width: 100%; padding: 14px; border-radius: var(--r);
+      background: var(--acid); color: #000; border: none;
+      font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s; margin-top: 8px;
+    }
+    .set-save-btn:active { transform: scale(0.98); }
+
+    /* body log table */
+    .log-table { width: 100%; border-collapse: collapse; }
+    .log-table th {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+      padding: 8px 16px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .log-table td {
+      font-size: 13px; padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .log-table tr:last-child td { border-bottom: none; }
+    .log-val { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+    .log-delta { font-size: 11px; }
+    .log-delta.pos { color: #F87171; }
+    .log-delta.neg { color: var(--green); }
+
+    /* weight custom overrides list */
+    .override-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-top: 1px solid var(--border);
+    }
+    .override-row:first-of-type { border-top: none; }
+    .override-name { flex: 1; font-size: 12px; line-height: 1.3; }
+    .override-val {
+      font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+      font-weight: 700; color: var(--acid);
+    }
+    .override-reset {
+      font-size: 11px; color: var(--muted); cursor: pointer;
+      padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border);
+      -webkit-tap-highlight-color: transparent; background: var(--card);
+    }
+
     @media (min-width: 540px) {
-      #screen-home    { max-width: 480px; margin: 0 auto; }
-      #screen-routine { max-width: 480px; margin: 0 auto; }
+      #s-home, #s-routine, #s-settings { max-width: 480px; margin: 0 auto; }
       .rtn-bottom { max-width: 480px; left: 50%; transform: translateX(-50%); border-radius: var(--r) var(--r) 0 0; }
     }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════
-     SCREEN: HOME
-══════════════════════════ -->
-<div id="screen-home">
-
+<!-- ══════════════════════════════
+     HOME
+══════════════════════════════ -->
+<div id="s-home" class="screen active">
   <div class="home-top">
     <span class="logo">Forja</span>
-    <div class="week-pill">
-      <span>Semana <strong id="weekNum">1</strong></span>
-      <div class="wp-btn" onclick="changeWeek(-1)">&#8249;</div>
-      <div class="wp-btn" onclick="changeWeek(1)">&#8250;</div>
+    <div class="home-actions">
+      <div class="icon-btn" onclick="openSettings()" title="Ajustes">⚙️</div>
+      <div class="week-pill">
+        <span>Sem <strong id="homeWeekNum">1</strong></span>
+        <div class="wp-btn" onclick="changeWeek(-1)">‹</div>
+        <div class="wp-btn" onclick="changeWeek(1)">›</div>
+      </div>
     </div>
   </div>
 
   <div class="home-hero">
-    <div class="home-eyebrow">Full Body · 5 días · Sin core</div>
+    <div class="home-eyebrow">Full Body · 5 días</div>
     <h1 class="home-title"><em>Forja</em></h1>
   </div>
 
-  <div class="chips">
-    <span class="chip">⚖️ <strong>97.5 kg</strong></span>
-    <span class="chip">📏 <strong>180 cm</strong></span>
-    <span class="chip">🔥 Grasa <strong>30.2%</strong></span>
-    <span class="chip">💪 Músculo <strong>35.5%</strong></span>
-    <span class="chip">🎯 Meta <strong>90 kg</strong></span>
-  </div>
+  <div class="chips" id="profileChips"></div>
 
   <div class="prog-row">
     <span class="prog-label">Programa</span>
@@ -335,50 +429,231 @@
   </div>
 
   <div class="day-grid" id="dayGrid"></div>
-
 </div>
 
-<!-- ══════════════════════════
-     SCREEN: ROUTINE
-══════════════════════════ -->
-<div id="screen-routine">
-
+<!-- ══════════════════════════════
+     ROUTINE
+══════════════════════════════ -->
+<div id="s-routine" class="screen">
   <div class="rtn-navbar">
-    <div class="rtn-back" onclick="goHome()">&#8592;</div>
+    <div class="rtn-back" onclick="goHome()">←</div>
     <div class="rtn-nav-title" id="rtnNavTitle">—</div>
-    <div class="rtn-week-badge" id="rtnWeekBadge">Sem 1</div>
+    <div class="rtn-week-ctrl">
+      <span class="rtn-week-num" id="rtnWeekNum">Sem 1</span>
+      <div class="rtn-wbtn" onclick="rtnChangeWeek(-1)">‹</div>
+      <div class="rtn-wbtn" onclick="rtnChangeWeek(1)">›</div>
+    </div>
+  </div>
+
+  <div class="day-complete-banner" id="completeBanner">
+    <span class="dcb-icon">🏆</span>
+    <div class="dcb-text">
+      <div class="dcb-title">¡Día completado!</div>
+      <div class="dcb-sub">Todos los ejercicios terminados.</div>
+    </div>
   </div>
 
   <div class="rtn-summary">
     <div class="sum-col"><div class="sum-val" id="sumEx">—</div><div class="sum-lbl">Ejercicios</div></div>
     <div class="sum-col"><div class="sum-val" id="sumSets">—</div><div class="sum-lbl">Series</div></div>
     <div class="sum-col"><div class="sum-val" id="sumMin">—</div><div class="sum-lbl">Min. est.</div></div>
-    <div class="sum-col"><div class="sum-val" id="sumGrp">—</div><div class="sum-lbl">Grupos</div></div>
+    <div class="sum-col"><div class="sum-val" id="sumDone">0</div><div class="sum-lbl">Hechos</div></div>
   </div>
 
   <div class="ex-list" id="exList"></div>
 
   <div class="rtn-bottom">
-    <button class="btn-prev" id="btnPrev" onclick="navDay(-1)">&#8592; Anterior</button>
-    <button class="btn-next" id="btnNext" onclick="navDay(1)">Siguiente &#8594;</button>
+    <button class="btn-prev" id="btnPrev" onclick="navDay(-1)">← Anterior</button>
+    <button class="btn-next" id="btnNext" onclick="navDay(1)">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SETTINGS
+══════════════════════════════ -->
+<div id="s-settings" class="screen">
+  <div class="set-navbar">
+    <div class="icon-btn" onclick="closeSettings()">←</div>
+    <span class="set-title">Ajustes</span>
   </div>
 
+  <!-- Body measurements -->
+  <div class="set-section">
+    <div class="set-section-title">Medidas corporales</div>
+    <div class="set-row">
+      <div class="set-row-label">
+        Peso
+        <div class="set-row-sub">Se guarda al guardar</div>
+      </div>
+      <input class="set-input" id="inputWeight" type="number" step="0.1" inputmode="decimal">
+      <span class="set-unit">kg</span>
+    </div>
+    <div class="set-row">
+      <div class="set-row-label">% Grasa corporal</div>
+      <input class="set-input" id="inputFat" type="number" step="0.1" inputmode="decimal">
+      <span class="set-unit">%</span>
+    </div>
+    <div class="set-row">
+      <div class="set-row-label">% Músculo</div>
+      <input class="set-input" id="inputMuscle" type="number" step="0.1" inputmode="decimal">
+      <span class="set-unit">%</span>
+    </div>
+    <div class="set-row">
+      <div class="set-row-label">Altura</div>
+      <input class="set-input" id="inputHeight" type="number" step="1" inputmode="numeric">
+      <span class="set-unit">cm</span>
+    </div>
+  </div>
+  <button class="set-save-btn" onclick="saveProfile()">Guardar medidas</button>
+
+  <!-- Body log -->
+  <div class="set-section" style="margin-top:20px" id="logSection">
+    <div class="set-section-title">Historial semanal</div>
+    <table class="log-table" id="logTable">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Peso</th>
+          <th>Grasa</th>
+          <th>Músculo</th>
+        </tr>
+      </thead>
+      <tbody id="logBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Custom base weights -->
+  <div class="set-section" style="margin-top:20px" id="overridesSection">
+    <div class="set-section-title">Pesos base personalizados</div>
+    <div id="overridesList"></div>
+  </div>
 </div>
 
 <script>
 // ══════════════════════════════════════════════
-// PROFILE & SCALE
-// leanMass = 97.5 × (1 - 0.302) = 68.1 kg
-// Scale vs 70 kg reference = 68.1/70 = 0.973
-// baseKg values are pre-scaled and snapped to nearest 2.5 kg
+// DAYS DATA
 // ══════════════════════════════════════════════
-const SCALE = (97.5 * (1 - 0.302)) / 70; // 0.973
+const DAYS = [
+  {
+    id:1, name:'Día 1', color:'#E8FF47',
+    focus:'Sentadilla · Jalones · Banca · Press Militar · Curl · Polea',
+    exercises:[
+      { key:'squat',    group:'🦵 Piernas', name:'Sentadilla con Barra Alta',           badge:'Cuádriceps · Glúteo',          sets:4, reps:'5–6',   rest:'3 min',   baseKg:80,  stepKg:2.5,  perHand:false, tip:'Baja hasta paralelo mínimo. Rodillas alineadas con los pies. Si la técnica falla, baja el peso antes que el rango.' },
+      { key:'latpull',  group:'🔙 Espalda', name:'Jalones al Pecho (Polea Alta)',        badge:'Dorsal ancho',                 sets:4, reps:'8–10',  rest:'2 min',   baseKg:55,  stepKg:1.25, perHand:false, tip:'Lleva la barra al esternón. Codos hacia el suelo. Baja controlado, no te dejes subir por la polea.' },
+      { key:'bench',    group:'🏋️ Pecho',  name:'Press de Banca con Barra',             badge:'Pectoral mayor',               sets:4, reps:'5–6',   rest:'3 min',   baseKg:70,  stepKg:2.5,  perHand:false, tip:'Omóplatos retraídos y pies planos. Baja en 2–3 seg. Empuje explosivo hacia arriba.' },
+      { key:'ohp',      group:'💛 Hombros', name:'Press Militar con Barra (de pie)',     badge:'Deltoides anterior',           sets:4, reps:'6–8',   rest:'2 min',   baseKg:45,  stepKg:1.25, perHand:false, tip:'Core apretado, sin arquear la espalda. Empuje vertical estricto.' },
+      { key:'curlEZ',   group:'💪 Bíceps',  name:'Curl con Barra EZ',                   badge:'Bíceps braquial',              sets:3, reps:'10–12', rest:'90 seg',  baseKg:25,  stepKg:1.25, perHand:false, tip:'Codos fijos al cuerpo. Sube hasta 90°+ y aprieta arriba. Baja sin soltar la tensión.' },
+      { key:'triRope',  group:'🦾 Tríceps', name:'Extensiones en Polea Alta (Cuerda)',  badge:'Tríceps (3 cabezas)',          sets:3, reps:'12–15', rest:'90 seg',  baseKg:20,  stepKg:1.25, perHand:false, tip:'Codo fijo al cuerpo. Separa la cuerda al final para activar las 3 cabezas. Extiende completamente.' }
+    ]
+  },
+  {
+    id:2, name:'Día 2', color:'#47FFCB',
+    focus:'Peso Muerto Rum. · Remo Barra · Press Inclinado · Arnold · Martillo · Press Francés',
+    exercises:[
+      { key:'rdl',      group:'🦵 Piernas', name:'Peso Muerto Rumano (Barra)',           badge:'Isquios · Glúteo · Lumbar',    sets:4, reps:'5–6',   rest:'3–4 min', baseKg:100, stepKg:2.5,  perHand:false, tip:'Espalda neutral siempre. Caderas atrás, barra roza las piernas. Pausa 1 seg abajo.' },
+      { key:'rowBar',   group:'🔙 Espalda', name:'Remo con Barra (Pendlay)',             badge:'Dorsal · Romboides · Trapecio',sets:4, reps:'6–8',   rest:'2–3 min', baseKg:65,  stepKg:2.5,  perHand:false, tip:'Torso a 45°. Tira al ombligo retrayendo escápulas. La barra parte del suelo cada rep.' },
+      { key:'inclineDB',group:'🏋️ Pecho',  name:'Press Inclinado con Mancuernas',       badge:'Pecho superior',               sets:4, reps:'8–10',  rest:'2 min',   baseKg:26,  stepKg:1.25, perHand:true,  tip:'Banco a 30–45°. Codos a 75°. Rango completo. Peso por mano.' },
+      { key:'arnold',   group:'💛 Hombros', name:'Press Arnold con Mancuernas',          badge:'Deltoides 3 cabezas',          sets:3, reps:'10–12', rest:'90 seg',  baseKg:18,  stepKg:1.25, perHand:true,  tip:'Empieza con palmas hacia ti, gira al subir. Cubre todo el arco del deltoides. Peso por mano.' },
+      { key:'hammer',   group:'💪 Bíceps',  name:'Curl Martillo con Mancuernas',         badge:'Bíceps · Braquial',            sets:3, reps:'10–12', rest:'90 seg',  baseKg:16,  stepKg:1.25, perHand:true,  tip:'Agarre neutro. Activa el braquial además del bíceps. Peso por mano.' },
+      { key:'frenchEZ', group:'🦾 Tríceps', name:'Press Francés con Barra EZ',          badge:'Cabeza larga tríceps',         sets:3, reps:'8–10',  rest:'90 seg',  baseKg:22,  stepKg:1.25, perHand:false, tip:'Codos apuntan al techo sin abrirlos. Baja la barra a la frente. Extiende completamente.' }
+    ]
+  },
+  {
+    id:3, name:'Día 3', color:'#C084FC',
+    focus:'Hip Thrust · Remo Cable · Banca Mancuernas · Elevaciones · Curl Polea · Fondos',
+    exercises:[
+      { key:'hipThrust',group:'🦵 Piernas', name:'Hip Thrust con Barra',                badge:'Glúteo mayor',                 sets:4, reps:'8–10',  rest:'2 min',   baseKg:80,  stepKg:2.5,  perHand:false, tip:'Espalda apoyada en banco. Cadera al nivel del torso arriba. Aprieta el glúteo 1 seg.' },
+      { key:'rowCable', group:'🔙 Espalda', name:'Remo en Polea Baja (Cable)',           badge:'Dorsal · Trapecio medio',      sets:4, reps:'10–12', rest:'2 min',   baseKg:55,  stepKg:1.25, perHand:false, tip:'Espalda recta, tira hacia el ombligo. Retrae escápulas en contracción. Control total.' },
+      { key:'benchDB',  group:'🏋️ Pecho',  name:'Press de Banca con Mancuernas',        badge:'Pectoral mayor',               sets:4, reps:'8–10',  rest:'2 min',   baseKg:28,  stepKg:1.25, perHand:true,  tip:'Mayor rango que con barra. Baja hasta que los codos queden bajo el banco. Peso por mano.' },
+      { key:'lateral',  group:'💛 Hombros', name:'Elevaciones Laterales con Mancuernas',badge:'Deltoides medial',             sets:4, reps:'12–15', rest:'90 seg',  baseKg:10,  stepKg:0.5,  perHand:true,  tip:'Codos ligeramente doblados. Sube hasta paralelo. Baja en 3 seg. Sin impulso. Peso por mano.' },
+      { key:'curlCable',group:'💪 Bíceps',  name:'Curl en Polea Baja',                  badge:'Bíceps (tensión constante)',   sets:3, reps:'12–15', rest:'90 seg',  baseKg:20,  stepKg:1.25, perHand:false, tip:'La polea mantiene tensión en toda la trayectoria. Ideal para volumen.' },
+      { key:'dips',     group:'🦾 Tríceps', name:'Fondos en Paralelas (Tríceps)',        badge:'Tríceps · Deltoides',          sets:3, reps:'10–12', rest:'2 min',   baseKg:0,   stepKg:0,    perHand:false, bodyweight:true, tip:'Cuerpo erguido para aislar el tríceps. Baja hasta 90° de codo. Añade lastre semana 4+.' }
+    ]
+  },
+  {
+    id:4, name:'Día 4', color:'#FF8C47',
+    focus:'Prensa · Jalón Cerrado · Press Inclinado Barra · Vuelos Post. · Curl Conc. · Patada',
+    exercises:[
+      { key:'legPress', group:'🦵 Piernas', name:'Prensa de Piernas 45°',               badge:'Cuádriceps · Glúteo',          sets:4, reps:'8–10',  rest:'2–3 min', baseKg:120, stepKg:5,    perHand:false, tip:'Pies a anchura de caderas. Baja lento 3 seg. No bloquees las rodillas arriba.' },
+      { key:'latClose', group:'🔙 Espalda', name:'Jalones Agarre Cerrado Neutro',        badge:'Dorsal · Bíceps',              sets:4, reps:'8–10',  rest:'2 min',   baseKg:55,  stepKg:1.25, perHand:false, tip:'Agarre neutro cerrado. Codos pegados al cuerpo al bajar. Activación diferente al ancho.' },
+      { key:'inclineB', group:'🏋️ Pecho',  name:'Press Inclinado con Barra',            badge:'Pecho superior · Deltoides',   sets:4, reps:'6–8',   rest:'2–3 min', baseKg:60,  stepKg:2.5,  perHand:false, tip:'Banco a 30°. Codos a 75°. Baja hasta el pecho superior. Movimiento compuesto pesado.' },
+      { key:'rearDelt', group:'💛 Hombros', name:'Vuelos Posteriores con Mancuernas',   badge:'Deltoides posterior',          sets:4, reps:'12–15', rest:'90 seg',  baseKg:10,  stepKg:0.5,  perHand:true,  tip:'Torso inclinado 45°. Abre los brazos como alas. Protege el manguito rotador. Peso por mano.' },
+      { key:'curlConc', group:'💪 Bíceps',  name:'Curl Concentrado con Mancuerna',      badge:'Bíceps (pico)',                sets:3, reps:'10–12', rest:'90 seg',  baseKg:14,  stepKg:1.25, perHand:true,  tip:'Codo apoyado en la rodilla. Máximo aislamiento. Sube hasta contracción total. Peso por mano.' },
+      { key:'kickback', group:'🦾 Tríceps', name:'Patada de Tríceps con Mancuerna',     badge:'Cabeza lateral tríceps',       sets:3, reps:'12–15', rest:'90 seg',  baseKg:10,  stepKg:1.25, perHand:true,  tip:'Torso paralelo al suelo. Codo fijo a 90°, extiende hacia atrás completamente. Peso por mano.' }
+    ]
+  },
+  {
+    id:5, name:'Día 5', color:'#FF4791',
+    focus:'Peso Muerto Sumo · Remo Barra · Banca · Elevaciones + Vuelos · Curl EZ · Press Francés',
+    exercises:[
+      { key:'sumo',     group:'🦵 Piernas', name:'Peso Muerto Sumo',                    badge:'Glúteo · Isquios · Aductores', sets:4, reps:'6–8',   rest:'3 min',   baseKg:95,  stepKg:2.5,  perHand:false, tip:'Pies amplios, puntas afuera. Barra sobre el empeine. Empuja el suelo afuera al subir.' },
+      { key:'rowBar2',  group:'🔙 Espalda', name:'Remo con Barra (Pendlay)',             badge:'Dorsal · Romboides · Trapecio',sets:4, reps:'6–8',   rest:'2–3 min', baseKg:65,  stepKg:2.5,  perHand:false, tip:'La barra parte del suelo cada rep. Tira explosivo, retrae escápulas.' },
+      { key:'bench2',   group:'🏋️ Pecho',  name:'Press de Banca con Barra',             badge:'Pectoral mayor',               sets:4, reps:'5–6',   rest:'3 min',   baseKg:70,  stepKg:2.5,  perHand:false, tip:'Día de fuerza: 5–6 reps pesadas. Omóplatos retraídos, pies planos, bajada controlada.' },
+      { key:'superSh',  group:'💛 Hombros', name:'Elevaciones Lat. + Vuelos Post. (SS)', badge:'Deltoides medial + posterior', sets:3, reps:'12+12', rest:'2 min',   baseKg:10,  stepKg:0.5,  perHand:true,  tip:'Sin descanso entre A y B. A) Elevaciones laterales 12 reps → B) Vuelos posteriores 12 reps. Peso por mano.' },
+      { key:'curlEZ2',  group:'💪 Bíceps',  name:'Curl con Barra EZ',                   badge:'Bíceps braquial',              sets:3, reps:'10–12', rest:'90 seg',  baseKg:25,  stepKg:1.25, perHand:false, tip:'Tempo 2-1-3: sube en 2 seg, aprieta 1 seg, baja en 3 seg.' },
+      { key:'french2',  group:'🦾 Tríceps', name:'Press Francés con Barra EZ',          badge:'Tríceps completo',             sets:3, reps:'8–10',  rest:'90 seg',  baseKg:22,  stepKg:1.25, perHand:false, tip:'Codos apuntan al techo sin abrirlos. Baja controlado, extiende completamente.' }
+    ]
+  }
+];
+
+// ══════════════════════════════════════════════
+// STORAGE HELPERS
+// ══════════════════════════════════════════════
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch { return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const MAX_WEEKS = 12;
+let currentWeek = load('forja_week', 1);
+let currentDay  = load('forja_lastDay', 0);
+
+// Profile
+let profile = load('forja_profile', {
+  weight: 97.5, fat: 30.2, muscle: 35.5, height: 180, goal: 90
+});
+
+// Body log: array of { date, weight, fat, muscle }
+let bodyLog = load('forja_bodyLog', [
+  { date: 'Inicio', weight: 97.5, fat: 30.2, muscle: 35.5 }
+]);
+
+// Custom base weights: { key: customBaseKg }
+let customBase = load('forja_customBase', {});
+
+// Checked exercises: { 'dayIdx-exIdx': bool }
+let checked = load('forja_checked', {});
+
+// Completed days: { 'week-dayIdx': true }
+let completedDays = load('forja_completedDays', {});
+
+// ══════════════════════════════════════════════
+// WEIGHT CALC
+// Scale = leanMass / 70
+// ══════════════════════════════════════════════
+function getScale() {
+  const leanMass = profile.weight * (1 - profile.fat / 100);
+  return leanMass / 70;
+}
 
 function calcKg(ex, week) {
   if (ex.bodyweight) return null;
-  const base = Math.round(ex.baseKg * SCALE / 2.5) * 2.5;
+  // Use custom base if set, else scale the default
+  let base;
+  if (customBase[ex.key] !== undefined) {
+    base = customBase[ex.key];
+  } else {
+    base = Math.round(ex.baseKg * getScale() / 2.5) * 2.5;
+  }
   return base + ex.stepKg * (week - 1);
 }
+
 function fmtKg(ex, week) {
   const w = calcKg(ex, week);
   if (w === null) return 'Peso corporal';
@@ -397,322 +672,87 @@ function fmtProg(ex) {
 }
 
 // ══════════════════════════════════════════════
-// 5 FIXED DAYS — 6 or 7 exercises, 1 per group
-// Groups: Piernas · Espalda · Pecho · Hombros · Bíceps · Tríceps
-// Day 1 and 3 have 7 exercises (extra leg variation)
+// CHECKED STATE
 // ══════════════════════════════════════════════
-const DAYS = [
+function checkKey(dayIdx, exIdx) { return dayIdx + '-' + exIdx; }
+function isChecked(dayIdx, exIdx) { return !!checked[checkKey(dayIdx, exIdx)]; }
 
-  // ─── DÍA 1 ───────────────────────────────
-  {
-    id: 1, name: 'Día 1', color: '#E8FF47',
-    focus: 'Sentadilla · Jalones · Banca · Press Militar · Curl · Polea',
-    exercises: [
-      {
-        group: '🦵 Piernas',
-        name: 'Sentadilla con Barra Alta',
-        badge: 'Cuádriceps · Glúteo',
-        sets: 4, reps: '5–6', rest: '3 min',
-        baseKg: 80, stepKg: 2.5, perHand: false,
-        tip: 'Baja hasta paralelo mínimo. Rodillas alineadas con los pies. Si la técnica falla, baja el peso antes que el rango.'
-      },
-      {
-        group: '🔙 Espalda',
-        name: 'Jalones al Pecho (Polea Alta)',
-        badge: 'Dorsal ancho',
-        sets: 4, reps: '8–10', rest: '2 min',
-        baseKg: 55, stepKg: 1.25, perHand: false,
-        tip: 'Lleva la barra al esternón. Codos hacia el suelo en la contracción. Baja controlado, no te dejes subir por la polea.'
-      },
-      {
-        group: '🏋️ Pecho',
-        name: 'Press de Banca con Barra',
-        badge: 'Pectoral mayor',
-        sets: 4, reps: '5–6', rest: '3 min',
-        baseKg: 70, stepKg: 2.5, perHand: false,
-        tip: 'Omóplatos retraídos y pies planos. Baja en 2–3 seg. Empuje explosivo hacia arriba.'
-      },
-      {
-        group: '💛 Hombros',
-        name: 'Press Militar con Barra (de pie)',
-        badge: 'Deltoides anterior',
-        sets: 4, reps: '6–8', rest: '2 min',
-        baseKg: 45, stepKg: 1.25, perHand: false,
-        tip: 'Core apretado, sin arquear la espalda. Empuje vertical estricto. Codos ligeramente adelantados.'
-      },
-      {
-        group: '💪 Bíceps',
-        name: 'Curl con Barra EZ',
-        badge: 'Bíceps braquial',
-        sets: 3, reps: '10–12', rest: '90 seg',
-        baseKg: 25, stepKg: 1.25, perHand: false,
-        tip: 'Codos fijos al cuerpo. Sube hasta 90°+ y aprieta arriba. Baja sin soltar la tensión.'
-      },
-      {
-        group: '🦾 Tríceps',
-        name: 'Extensiones en Polea Alta (Cuerda)',
-        badge: 'Tríceps (3 cabezas)',
-        sets: 3, reps: '12–15', rest: '90 seg',
-        baseKg: 20, stepKg: 1.25, perHand: false,
-        tip: 'Codo fijo al cuerpo. Separa la cuerda al final para activar las 3 cabezas. Extiende completamente.'
-      }
-    ]
-  },
+function toggleCheck(dayIdx, exIdx) {
+  const k = checkKey(dayIdx, exIdx);
+  checked[k] = !checked[k];
+  save('forja_checked', checked);
+  updateCheckUI(dayIdx, exIdx);
+  updateDoneCount(dayIdx);
+  checkDayComplete(dayIdx);
+}
 
-  // ─── DÍA 2 ───────────────────────────────
-  {
-    id: 2, name: 'Día 2', color: '#47FFCB',
-    focus: 'Peso Muerto Rum. · Remo Barra · Press Inclinado · Arnold · Martillo · Press Francés',
-    exercises: [
-      {
-        group: '🦵 Piernas',
-        name: 'Peso Muerto Rumano (Barra)',
-        badge: 'Isquios · Glúteo · Lumbar',
-        sets: 4, reps: '5–6', rest: '3–4 min',
-        baseKg: 100, stepKg: 2.5, perHand: false,
-        tip: 'Espalda neutral siempre. Caderas atrás, barra roza las piernas. Pausa 1 seg abajo. Usa cinturón a partir de semana 5.'
-      },
-      {
-        group: '🔙 Espalda',
-        name: 'Remo con Barra (Pendlay)',
-        badge: 'Dorsal · Romboides · Trapecio',
-        sets: 4, reps: '6–8', rest: '2–3 min',
-        baseKg: 65, stepKg: 2.5, perHand: false,
-        tip: 'Torso a 45°, espalda recta. Tira al ombligo retrayendo escápulas. La barra parte del suelo en cada rep.'
-      },
-      {
-        group: '🏋️ Pecho',
-        name: 'Press Inclinado con Mancuernas',
-        badge: 'Pecho superior',
-        sets: 4, reps: '8–10', rest: '2 min',
-        baseKg: 26, stepKg: 1.25, perHand: true,
-        tip: 'Banco a 30–45°. Codos a 75°, no los abras demasiado. Rango completo de movimiento. Peso por mano.'
-      },
-      {
-        group: '💛 Hombros',
-        name: 'Press Arnold con Mancuernas',
-        badge: 'Deltoides 3 cabezas',
-        sets: 3, reps: '10–12', rest: '90 seg',
-        baseKg: 18, stepKg: 1.25, perHand: true,
-        tip: 'Empieza con palmas hacia ti, gira al subir hasta pronación. Cubre todo el arco del deltoides. Peso por mano.'
-      },
-      {
-        group: '💪 Bíceps',
-        name: 'Curl Martillo con Mancuernas',
-        badge: 'Bíceps · Braquial',
-        sets: 3, reps: '10–12', rest: '90 seg',
-        baseKg: 16, stepKg: 1.25, perHand: true,
-        tip: 'Agarre neutro (palma hacia adentro). Activa el braquial además del bíceps. Peso por mano.'
-      },
-      {
-        group: '🦾 Tríceps',
-        name: 'Press Francés con Barra EZ',
-        badge: 'Cabeza larga tríceps',
-        sets: 3, reps: '8–10', rest: '90 seg',
-        baseKg: 22, stepKg: 1.25, perHand: false,
-        tip: 'Codos apuntan al techo sin abrirlos. Baja la barra a la frente. Extiende completamente.'
-      }
-    ]
-  },
+function updateCheckUI(dayIdx, exIdx) {
+  const cb = document.getElementById('cb-' + dayIdx + '-' + exIdx);
+  const card = document.getElementById('card-' + dayIdx + '-' + exIdx);
+  if (!cb || !card) return;
+  const done = isChecked(dayIdx, exIdx);
+  cb.classList.toggle('done', done);
+  cb.textContent = done ? '✓' : '';
+  card.classList.toggle('checked', done);
+}
 
-  // ─── DÍA 3 ───────────────────────────────
-  {
-    id: 3, name: 'Día 3', color: '#C084FC',
-    focus: 'Hip Thrust · Remo Cable · Banca Mancuernas · Elevaciones Lat. · Curl Polea · Fondos',
-    exercises: [
-      {
-        group: '🦵 Piernas',
-        name: 'Hip Thrust con Barra',
-        badge: 'Glúteo mayor',
-        sets: 4, reps: '8–10', rest: '2 min',
-        baseKg: 80, stepKg: 2.5, perHand: false,
-        tip: 'Espalda apoyada en banco. Cadera al nivel del torso en el punto más alto. Aprieta el glúteo 1 seg arriba.'
-      },
-      {
-        group: '🔙 Espalda',
-        name: 'Remo en Polea Baja (Cable)',
-        badge: 'Dorsal · Trapecio medio',
-        sets: 4, reps: '10–12', rest: '2 min',
-        baseKg: 55, stepKg: 1.25, perHand: false,
-        tip: 'Espalda recta, tira hacia el ombligo. Retrae las escápulas en contracción. Controla la vuelta sin inclinarte.'
-      },
-      {
-        group: '🏋️ Pecho',
-        name: 'Press de Banca con Mancuernas',
-        badge: 'Pectoral mayor',
-        sets: 4, reps: '8–10', rest: '2 min',
-        baseKg: 28, stepKg: 1.25, perHand: true,
-        tip: 'Mayor rango que con barra. Baja hasta que los codos queden bajo el banco. Peso por mano.'
-      },
-      {
-        group: '💛 Hombros',
-        name: 'Elevaciones Laterales con Mancuernas',
-        badge: 'Deltoides medial',
-        sets: 4, reps: '12–15', rest: '90 seg',
-        baseKg: 10, stepKg: 0.5, perHand: true,
-        tip: 'Codos ligeramente doblados. Sube hasta paralelo. Baja en 3 seg. Sin impulso de cintura. Peso por mano.'
-      },
-      {
-        group: '💪 Bíceps',
-        name: 'Curl en Polea Baja',
-        badge: 'Bíceps (tensión constante)',
-        sets: 3, reps: '12–15', rest: '90 seg',
-        baseKg: 20, stepKg: 1.25, perHand: false,
-        tip: 'La polea mantiene tensión en toda la trayectoria a diferencia del curl libre. Ideal para volumen.'
-      },
-      {
-        group: '🦾 Tríceps',
-        name: 'Fondos en Paralelas (Tríceps)',
-        badge: 'Tríceps · Deltoides',
-        sets: 3, reps: '10–12', rest: '2 min',
-        baseKg: 0, stepKg: 0, perHand: false, bodyweight: true,
-        tip: 'Cuerpo erguido y vertical para aislar el tríceps. Baja hasta 90° de codo. Añade lastre en semana 4+.'
-      }
-    ]
-  },
+function updateDoneCount(dayIdx) {
+  const total = DAYS[dayIdx].exercises.length;
+  const done = DAYS[dayIdx].exercises.filter((_, i) => isChecked(dayIdx, i)).length;
+  const el = document.getElementById('sumDone');
+  if (el) el.textContent = done + '/' + total;
+}
 
-  // ─── DÍA 4 ───────────────────────────────
-  {
-    id: 4, name: 'Día 4', color: '#FF8C47',
-    focus: 'Prensa · Jalón Cerrado · Press Inclinado Barra · Vuelos Post. · Curl Concentrado · Patada',
-    exercises: [
-      {
-        group: '🦵 Piernas',
-        name: 'Prensa de Piernas 45°',
-        badge: 'Cuádriceps · Glúteo',
-        sets: 4, reps: '8–10', rest: '2–3 min',
-        baseKg: 120, stepKg: 5, perHand: false,
-        tip: 'Pies a anchura de caderas. Baja lento 3 seg. No bloquees las rodillas arriba. No despegues el glúteo.'
-      },
-      {
-        group: '🔙 Espalda',
-        name: 'Jalones Agarre Cerrado Neutro',
-        badge: 'Dorsal · Bíceps',
-        sets: 4, reps: '8–10', rest: '2 min',
-        baseKg: 55, stepKg: 1.25, perHand: false,
-        tip: 'Agarre neutro cerrado. Codos pegados al cuerpo al bajar. Activación diferente al agarre ancho.'
-      },
-      {
-        group: '🏋️ Pecho',
-        name: 'Press Inclinado con Barra',
-        badge: 'Pecho superior · Deltoides',
-        sets: 4, reps: '6–8', rest: '2–3 min',
-        baseKg: 60, stepKg: 2.5, perHand: false,
-        tip: 'Banco a 30°. Codos a 75°. Baja hasta el pecho superior. Movimiento compuesto pesado.'
-      },
-      {
-        group: '💛 Hombros',
-        name: 'Vuelos Posteriores con Mancuernas',
-        badge: 'Deltoides posterior',
-        sets: 4, reps: '12–15', rest: '90 seg',
-        baseKg: 10, stepKg: 0.5, perHand: true,
-        tip: 'Torso inclinado 45°. Abre los brazos como alas. Equilibra el deltoides y protege el manguito rotador. Peso por mano.'
-      },
-      {
-        group: '💪 Bíceps',
-        name: 'Curl Concentrado con Mancuerna',
-        badge: 'Bíceps (pico)',
-        sets: 3, reps: '10–12', rest: '90 seg',
-        baseKg: 14, stepKg: 1.25, perHand: true,
-        tip: 'Codo apoyado en la rodilla. Máximo aislamiento. Sube hasta contracción total. Peso por mano.'
-      },
-      {
-        group: '🦾 Tríceps',
-        name: 'Patada de Tríceps con Mancuerna',
-        badge: 'Cabeza lateral tríceps',
-        sets: 3, reps: '12–15', rest: '90 seg',
-        baseKg: 10, stepKg: 1.25, perHand: true,
-        tip: 'Torso paralelo al suelo. Codo fijo a 90°, extiende hacia atrás completamente. Peso por mano.'
-      }
-    ]
-  },
-
-  // ─── DÍA 5 ───────────────────────────────
-  {
-    id: 5, name: 'Día 5', color: '#FF4791',
-    focus: 'Peso Muerto Sumo · Remo Barra · Banca · Elevaciones + Vuelos · Curl EZ · Press Francés',
-    exercises: [
-      {
-        group: '🦵 Piernas',
-        name: 'Peso Muerto Sumo',
-        badge: 'Glúteo · Isquios · Aductores',
-        sets: 4, reps: '6–8', rest: '3 min',
-        baseKg: 95, stepKg: 2.5, perHand: false,
-        tip: 'Pies amplios, puntas hacia afuera. Barra sobre el empeine. Empuja el suelo hacia afuera al subir. Espalda neutral.'
-      },
-      {
-        group: '🔙 Espalda',
-        name: 'Remo con Barra (Pendlay)',
-        badge: 'Dorsal · Romboides · Trapecio',
-        sets: 4, reps: '6–8', rest: '2–3 min',
-        baseKg: 65, stepKg: 2.5, perHand: false,
-        tip: 'La barra parte del suelo cada rep. Tira explosivo, retrae escápulas. Espalda casi paralela al suelo.'
-      },
-      {
-        group: '🏋️ Pecho',
-        name: 'Press de Banca con Barra',
-        badge: 'Pectoral mayor',
-        sets: 4, reps: '5–6', rest: '3 min',
-        baseKg: 70, stepKg: 2.5, perHand: false,
-        tip: 'Día de fuerza: 5–6 reps pesadas. Omóplatos retraídos, pies planos, bajada controlada siempre.'
-      },
-      {
-        group: '💛 Hombros',
-        name: 'Elevaciones Lat. + Vuelos Post. (Superserie)',
-        badge: 'Deltoides medial + posterior',
-        sets: 3, reps: '12 + 12', rest: '2 min',
-        baseKg: 10, stepKg: 0.5, perHand: true,
-        tip: 'Sin descanso entre A y B. A) Elevaciones laterales 12 reps → B) Vuelos posteriores 12 reps. Peso por mano en cada uno.'
-      },
-      {
-        group: '💪 Bíceps',
-        name: 'Curl con Barra EZ',
-        badge: 'Bíceps braquial',
-        sets: 3, reps: '10–12', rest: '90 seg',
-        baseKg: 25, stepKg: 1.25, perHand: false,
-        tip: 'Tempo 2-1-3: sube en 2 seg, aprieta 1 seg, baja en 3 seg. Máxima tensión en el músculo.'
-      },
-      {
-        group: '🦾 Tríceps',
-        name: 'Press Francés con Barra EZ',
-        badge: 'Tríceps completo',
-        sets: 3, reps: '8–10', rest: '90 seg',
-        baseKg: 22, stepKg: 1.25, perHand: false,
-        tip: 'Codos apuntan al techo sin abrirlos. Baja controlado, extiende completamente. Finalizador del programa.'
-      }
-    ]
+function checkDayComplete(dayIdx) {
+  const total = DAYS[dayIdx].exercises.length;
+  const done = DAYS[dayIdx].exercises.filter((_, i) => isChecked(dayIdx, i)).length;
+  const isComplete = done === total;
+  const banner = document.getElementById('completeBanner');
+  if (banner) banner.classList.toggle('show', isComplete);
+  if (isComplete) {
+    const k = currentWeek + '-' + dayIdx;
+    completedDays[k] = true;
+    save('forja_completedDays', completedDays);
+    renderHome(); // update home day list
   }
+}
 
-];
-
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
-let currentWeek = parseInt(localStorage.getItem('forja_week') || '1');
-let currentDay  = 0;
-const MAX_WEEKS = 12;
+function isDayComplete(week, dayIdx) {
+  return !!completedDays[week + '-' + dayIdx];
+}
 
 // ══════════════════════════════════════════════
 // RENDER HOME
 // ══════════════════════════════════════════════
 function renderHome() {
-  document.getElementById('weekNum').textContent = currentWeek;
+  document.getElementById('homeWeekNum').textContent = currentWeek;
   const pct = Math.round(((currentWeek - 1) / (MAX_WEEKS - 1)) * 100);
   document.getElementById('progFill').style.width = pct + '%';
   document.getElementById('progPct').textContent = pct + '%';
 
+  // Profile chips
+  const chips = document.getElementById('profileChips');
+  chips.innerHTML = `
+    <span class="chip">⚖️ <strong>${profile.weight} kg</strong></span>
+    <span class="chip">📏 <strong>${profile.height} cm</strong></span>
+    <span class="chip">🔥 Grasa <strong>${profile.fat}%</strong></span>
+    <span class="chip">💪 Músculo <strong>${profile.muscle}%</strong></span>
+    <span class="chip">🎯 Meta <strong>${profile.goal} kg</strong></span>
+  `;
+
   const grid = document.getElementById('dayGrid');
   grid.innerHTML = '';
   DAYS.forEach((day, idx) => {
+    const done = isDayComplete(currentWeek, idx);
     const btn = document.createElement('div');
-    btn.className = 'day-btn' + (idx === currentDay ? ' active' : '');
+    btn.className = 'day-btn' + (done ? ' done' : '');
     btn.innerHTML = `
       <div class="day-btn-num">${String(day.id).padStart(2,'0')}</div>
       <div class="day-btn-info">
         <div class="day-btn-name">${day.name}</div>
         <div class="day-btn-groups">${day.focus}</div>
       </div>
-      <div class="day-btn-arrow">›</div>
+      <div class="day-btn-status">${done ? '✅' : '›'}</div>
     `;
     btn.addEventListener('click', () => openDay(idx));
     grid.appendChild(btn);
@@ -727,17 +767,20 @@ function renderRoutine(dayIdx, week) {
   document.documentElement.style.setProperty('--acid', day.color);
 
   document.getElementById('rtnNavTitle').textContent = day.name + ' · ' + day.id + '/5';
-  document.getElementById('rtnWeekBadge').textContent = 'Sem. ' + week;
+  document.getElementById('rtnWeekNum').textContent = 'Sem ' + week;
 
   const exArr = day.exercises;
   const totalSets = exArr.reduce((s, e) => s + e.sets, 0);
   const estMin = Math.round(totalSets * 2.5 + exArr.length * 1.5);
-  const groups = new Set(exArr.map(e => e.group)).size;
+  const doneCount = exArr.filter((_, i) => isChecked(dayIdx, i)).length;
 
   document.getElementById('sumEx').textContent   = exArr.length;
   document.getElementById('sumSets').textContent = totalSets;
   document.getElementById('sumMin').textContent  = '~' + estMin;
-  document.getElementById('sumGrp').textContent  = groups;
+  document.getElementById('sumDone').textContent = doneCount + '/' + exArr.length;
+
+  const isComplete = doneCount === exArr.length;
+  document.getElementById('completeBanner').classList.toggle('show', isComplete);
 
   const list = document.getElementById('exList');
   list.innerHTML = '';
@@ -752,13 +795,24 @@ function renderRoutine(dayIdx, week) {
       lastGroup = ex.group;
     }
 
+    const done = isChecked(dayIdx, idx);
     const card = document.createElement('div');
-    card.className = 'ex-card';
+    card.className = 'ex-card' + (done ? ' checked' : '');
+    card.id = 'card-' + dayIdx + '-' + idx;
     card.style.animationDelay = (idx * 0.04) + 's';
+
+    const w = calcKg(ex, week);
+    const baseForEdit = customBase[ex.key] !== undefined
+      ? customBase[ex.key]
+      : Math.round(ex.baseKg * getScale() / 2.5) * 2.5;
+
     card.innerHTML = `
       <div class="ex-top">
-        <div class="ex-name">${ex.name}</div>
-        <div class="ex-badge">${ex.badge}</div>
+        <div class="ex-top-left">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-badge">${ex.badge}</div>
+        </div>
+        <div class="ex-check${done ? ' done' : ''}" id="cb-${dayIdx}-${idx}" onclick="toggleCheck(${dayIdx},${idx})">${done ? '✓' : ''}</div>
       </div>
       <div class="ex-tags">
         <span class="tag t-sets">${ex.sets} series</span>
@@ -768,11 +822,17 @@ function renderRoutine(dayIdx, week) {
       <div class="weight-box">
         <div class="wbox-cell">
           <div class="wbox-lbl">Peso hoy</div>
-          <div class="wbox-val hi">${fmtKg(ex, week)}</div>
+          <div class="wbox-edit-row">
+            <input class="wbox-input" id="wi-${ex.key}" type="number" step="2.5" inputmode="decimal"
+              value="${w !== null ? w : ''}"
+              ${ex.bodyweight ? 'disabled placeholder="—"' : ''}>
+            <span class="wbox-unit">${ex.perHand ? 'kg/m' : 'kg'}</span>
+            <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx},${week})">✓</button>
+          </div>
         </div>
         <div class="wbox-cell">
           <div class="wbox-lbl">Próx. semana</div>
-          <div class="wbox-val">${fmtNext(ex, week)}</div>
+          <div class="wbox-val" id="wn-${dayIdx}-${idx}">${fmtNext(ex, week)}</div>
         </div>
         <div class="wbox-cell">
           <div class="wbox-lbl">Progresión</div>
@@ -784,27 +844,57 @@ function renderRoutine(dayIdx, week) {
     list.appendChild(card);
   });
 
-  document.getElementById('btnPrev').style.visibility =
-    dayIdx === 0 ? 'hidden' : 'visible';
-  document.getElementById('btnNext').textContent =
-    dayIdx === DAYS.length - 1 ? '✓ Listo' : 'Siguiente ›';
+  document.getElementById('btnPrev').style.visibility = dayIdx === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').textContent = dayIdx === DAYS.length - 1 ? '✓ Listo' : 'Siguiente →';
+}
+
+// ══════════════════════════════════════════════
+// INLINE WEIGHT EDIT
+// When user types a new weight and taps ✓,
+// we back-calculate what the baseKg should be
+// so that the progression is preserved correctly
+// ══════════════════════════════════════════════
+function saveWeightOverride(key, exIdx, dayIdx, week) {
+  const input = document.getElementById('wi-' + key);
+  if (!input) return;
+  const newWeight = parseFloat(input.value);
+  if (isNaN(newWeight) || newWeight <= 0) return;
+
+  // Find exercise
+  const ex = DAYS[dayIdx].exercises[exIdx];
+  // Back-calculate base: newWeight = base + stepKg*(week-1)
+  const newBase = newWeight - ex.stepKg * (week - 1);
+  customBase[key] = Math.round(newBase * 10) / 10;
+  save('forja_customBase', customBase);
+
+  // Update "next week" display
+  const nextEl = document.getElementById('wn-' + dayIdx + '-' + exIdx);
+  if (nextEl) nextEl.textContent = fmtNext({ ...ex, baseKg: newBase }, week);
+
+  // Flash confirmation
+  const btn = input.nextElementSibling.nextElementSibling;
+  if (btn) { btn.textContent = '✅'; setTimeout(() => { btn.textContent = '✓'; }, 1200); }
 }
 
 // ══════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
 function openDay(idx) {
   currentDay = idx;
+  save('forja_lastDay', idx);
   renderRoutine(idx, currentWeek);
-  document.getElementById('screen-home').style.display    = 'none';
-  document.getElementById('screen-routine').style.display = 'flex';
-  window.scrollTo(0, 0);
+  showScreen('s-routine');
 }
 
 function goHome() {
   document.documentElement.style.setProperty('--acid', '#E8FF47');
-  document.getElementById('screen-home').style.display    = 'flex';
-  document.getElementById('screen-routine').style.display = 'none';
+  showScreen('s-home');
   renderHome();
 }
 
@@ -813,14 +903,130 @@ function navDay(delta) {
   if (next < 0) return;
   if (next >= DAYS.length) { goHome(); return; }
   currentDay = next;
+  save('forja_lastDay', currentDay);
   renderRoutine(currentDay, currentWeek);
   window.scrollTo(0, 0);
 }
 
 function changeWeek(delta) {
   currentWeek = Math.max(1, Math.min(MAX_WEEKS, currentWeek + delta));
-  localStorage.setItem('forja_week', currentWeek);
+  save('forja_week', currentWeek);
   renderHome();
+}
+
+function rtnChangeWeek(delta) {
+  currentWeek = Math.max(1, Math.min(MAX_WEEKS, currentWeek + delta));
+  save('forja_week', currentWeek);
+  renderRoutine(currentDay, currentWeek);
+  // also update home week num if visible
+  document.getElementById('homeWeekNum').textContent = currentWeek;
+}
+
+// ══════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════
+function openSettings() {
+  // Populate inputs
+  document.getElementById('inputWeight').value  = profile.weight;
+  document.getElementById('inputFat').value     = profile.fat;
+  document.getElementById('inputMuscle').value  = profile.muscle;
+  document.getElementById('inputHeight').value  = profile.height;
+
+  // Body log table
+  renderLog();
+
+  // Overrides list
+  renderOverrides();
+
+  showScreen('s-settings');
+}
+
+function closeSettings() {
+  document.documentElement.style.setProperty('--acid', '#E8FF47');
+  showScreen('s-home');
+  renderHome();
+}
+
+function saveProfile() {
+  const newWeight  = parseFloat(document.getElementById('inputWeight').value);
+  const newFat     = parseFloat(document.getElementById('inputFat').value);
+  const newMuscle  = parseFloat(document.getElementById('inputMuscle').value);
+  const newHeight  = parseFloat(document.getElementById('inputHeight').value);
+
+  if ([newWeight, newFat, newMuscle, newHeight].some(isNaN)) {
+    alert('Por favor completa todos los campos correctamente.'); return;
+  }
+
+  // Add to log if weight changed
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('es-AR', { day:'numeric', month:'short' });
+  bodyLog.push({ date: dateStr, weight: newWeight, fat: newFat, muscle: newMuscle });
+  save('forja_bodyLog', bodyLog);
+
+  profile.weight = newWeight;
+  profile.fat    = newFat;
+  profile.muscle = newMuscle;
+  profile.height = newHeight;
+  save('forja_profile', profile);
+
+  renderLog();
+
+  // Flash save button
+  const btn = document.querySelector('.set-save-btn');
+  btn.textContent = '✅ Guardado';
+  setTimeout(() => { btn.textContent = 'Guardar medidas'; }, 1500);
+}
+
+function renderLog() {
+  const tbody = document.getElementById('logBody');
+  tbody.innerHTML = '';
+  const entries = [...bodyLog].reverse().slice(0, 12);
+  entries.forEach((entry, i) => {
+    const prev = bodyLog[bodyLog.length - 1 - i - 1];
+    const delta = prev ? (entry.weight - prev.weight) : 0;
+    const sign = delta > 0 ? '+' : '';
+    const cls  = delta > 0 ? 'pos' : delta < 0 ? 'neg' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${entry.date}</td>
+      <td><span class="log-val">${entry.weight}</span> kg
+        ${i < entries.length - 1 && delta !== 0
+          ? `<br><span class="log-delta ${cls}">${sign}${delta.toFixed(1)} kg</span>`
+          : ''}</td>
+      <td>${entry.fat}%</td>
+      <td>${entry.muscle}%</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderOverrides() {
+  const container = document.getElementById('overridesList');
+  const keys = Object.keys(customBase);
+  if (keys.length === 0) {
+    container.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--muted)">No hay pesos personalizados aún.<br>Edítalos directamente en cada ejercicio.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  keys.forEach(key => {
+    // Find exercise name
+    let exName = key;
+    DAYS.forEach(d => d.exercises.forEach(e => { if (e.key === key) exName = e.name; }));
+    const row = document.createElement('div');
+    row.className = 'override-row';
+    row.innerHTML = `
+      <span class="override-name">${exName}</span>
+      <span class="override-val">${customBase[key]} kg base</span>
+      <span class="override-reset" onclick="resetOverride('${key}')">Resetear</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function resetOverride(key) {
+  delete customBase[key];
+  save('forja_customBase', customBase);
+  renderOverrides();
 }
 
 // ══════════════════════════════════════════════
