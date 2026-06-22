@@ -642,16 +642,16 @@ function getScale() {
   return leanMass / 70;
 }
 
+// Returns the base weight for week 1 (custom or scaled default)
+function getBase(ex) {
+  if (customBase[ex.key] !== undefined) return customBase[ex.key];
+  return Math.round(ex.baseKg * getScale() / 2.5) * 2.5;
+}
+
+// Weight for a given week
 function calcKg(ex, week) {
   if (ex.bodyweight) return null;
-  // Use custom base if set, else scale the default
-  let base;
-  if (customBase[ex.key] !== undefined) {
-    base = customBase[ex.key];
-  } else {
-    base = Math.round(ex.baseKg * getScale() / 2.5) * 2.5;
-  }
-  return base + ex.stepKg * (week - 1);
+  return getBase(ex) + ex.stepKg * (week - 1);
 }
 
 function fmtKg(ex, week) {
@@ -801,10 +801,8 @@ function renderRoutine(dayIdx, week) {
     card.id = 'card-' + dayIdx + '-' + idx;
     card.style.animationDelay = (idx * 0.04) + 's';
 
-    const w = calcKg(ex, week);
-    const baseForEdit = customBase[ex.key] !== undefined
-      ? customBase[ex.key]
-      : Math.round(ex.baseKg * getScale() / 2.5) * 2.5;
+    const wToday  = calcKg(ex, week);   // peso esta semana
+    const wBase   = getBase(ex);          // peso base semana 1 (lo que edita el usuario)
 
     card.innerHTML = `
       <div class="ex-top">
@@ -821,25 +819,28 @@ function renderRoutine(dayIdx, week) {
       </div>
       <div class="weight-box">
         <div class="wbox-cell">
-          <div class="wbox-lbl">Peso hoy</div>
-          <div class="wbox-edit-row">
-            <input class="wbox-input" id="wi-${ex.key}" type="text" inputmode="decimal"
-              value="${w !== null ? String(w).replace('.', ',') : ''}"
-              ${ex.bodyweight ? 'disabled placeholder="—"' : ''}>
-            <span class="wbox-unit">${ex.perHand ? 'kg/m' : 'kg'}</span>
-            <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx})">✓</button>
-          </div>
+          <div class="wbox-lbl">Peso sem. ${week}</div>
+          <div class="wbox-val hi">${wToday !== null ? wToday + (ex.perHand ? ' kg/m' : ' kg') : 'Corporal'}</div>
         </div>
         <div class="wbox-cell">
           <div class="wbox-lbl">Próx. semana</div>
-          <div class="wbox-val" id="wn-${dayIdx}-${idx}">${fmtNext(ex, week)}</div>
+          <div class="wbox-val">${fmtNext(ex, week)}</div>
         </div>
         <div class="wbox-cell">
           <div class="wbox-lbl">Progresión</div>
           <div class="wbox-val">${fmtProg(ex)}</div>
         </div>
       </div>
-      ${ex.tip ? `<div class="ex-tip">${ex.tip}</div>` : ''}
+      <div class="wbox-edit-row" style="margin-top:8px;padding:0 2px">
+        <span style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap">Peso base (sem 1):</span>
+        <input class="wbox-input" id="wi-${ex.key}" type="text" inputmode="decimal"
+          style="margin-left:8px"
+          value="${!ex.bodyweight ? String(wBase).replace('.', ',') : ''}"
+          ${ex.bodyweight ? 'disabled placeholder="—"' : ''}>
+        <span class="wbox-unit" style="margin-left:2px">${ex.perHand ? 'kg/m' : 'kg'}</span>
+        <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx})">✓</button>
+      </div>
+      ${ex.tip ? `<div class="ex-tip" style="margin-top:8px">${ex.tip}</div>` : ''}
     `;
     list.appendChild(card);
   });
@@ -855,31 +856,28 @@ function renderRoutine(dayIdx, week) {
 // so that the progression is preserved correctly
 // ══════════════════════════════════════════════
 function saveWeightOverride(key, exIdx, dayIdx) {
-  // Always use currentWeek — not a stale value baked at render time
-  const week = currentWeek;
   const input = document.getElementById('wi-' + key);
   if (!input) return;
+
   // Accept comma as decimal separator (iOS keyboards)
   const rawVal = input.value.replace(',', '.');
-  const newWeight = parseFloat(rawVal);
-  if (isNaN(newWeight) || newWeight <= 0) return;
+  const newBase = parseFloat(rawVal);
+  if (isNaN(newBase) || newBase <= 0) return;
 
-  // Find exercise
-  const ex = DAYS[dayIdx].exercises[exIdx];
-  // Back-calculate the base so that: base + stepKg*(week-1) = newWeight
-  const newBase = newWeight - ex.stepKg * (week - 1);
+  // Store the base directly — no back-calculation needed
+  // The input always shows/edits the week-1 base weight
   customBase[key] = Math.round(newBase * 10) / 10;
   save('forja_customBase', customBase);
 
-  // Re-render the whole routine so every cell (current + next + all weeks) is correct
-  renderRoutine(dayIdx, week);
+  // Re-render so peso hoy + próxima semana update immediately
+  renderRoutine(dayIdx, currentWeek);
 
-  // Flash the save button — query after re-render so DOM is fresh
+  // Flash the button after re-render
   setTimeout(() => {
-    const savedInput = document.getElementById('wi-' + key);
-    if (savedInput) {
-      const saveBtn = savedInput.parentElement.querySelector('.wbox-save');
-      if (saveBtn) { saveBtn.textContent = '✅'; setTimeout(() => { saveBtn.textContent = '✓'; }, 1400); }
+    const inp = document.getElementById('wi-' + key);
+    if (inp) {
+      const btn = inp.parentElement.querySelector('.wbox-save');
+      if (btn) { btn.textContent = '✅'; setTimeout(() => { btn.textContent = '✓'; }, 1400); }
     }
   }, 0);
 }
