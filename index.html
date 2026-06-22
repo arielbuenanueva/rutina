@@ -485,22 +485,22 @@
         Peso
         <div class="set-row-sub">Se guarda al guardar</div>
       </div>
-      <input class="set-input" id="inputWeight" type="number" step="0.1" inputmode="decimal">
+      <input class="set-input" id="inputWeight" type="text" inputmode="decimal">
       <span class="set-unit">kg</span>
     </div>
     <div class="set-row">
       <div class="set-row-label">% Grasa corporal</div>
-      <input class="set-input" id="inputFat" type="number" step="0.1" inputmode="decimal">
+      <input class="set-input" id="inputFat" type="text" inputmode="decimal">
       <span class="set-unit">%</span>
     </div>
     <div class="set-row">
       <div class="set-row-label">% Músculo</div>
-      <input class="set-input" id="inputMuscle" type="number" step="0.1" inputmode="decimal">
+      <input class="set-input" id="inputMuscle" type="text" inputmode="decimal">
       <span class="set-unit">%</span>
     </div>
     <div class="set-row">
       <div class="set-row-label">Altura</div>
-      <input class="set-input" id="inputHeight" type="number" step="1" inputmode="numeric">
+      <input class="set-input" id="inputHeight" type="text" inputmode="numeric">
       <span class="set-unit">cm</span>
     </div>
   </div>
@@ -823,8 +823,8 @@ function renderRoutine(dayIdx, week) {
         <div class="wbox-cell">
           <div class="wbox-lbl">Peso hoy</div>
           <div class="wbox-edit-row">
-            <input class="wbox-input" id="wi-${ex.key}" type="number" step="2.5" inputmode="decimal"
-              value="${w !== null ? w : ''}"
+            <input class="wbox-input" id="wi-${ex.key}" type="text" inputmode="decimal"
+              value="${w !== null ? String(w).replace('.', ',') : ''}"
               ${ex.bodyweight ? 'disabled placeholder="—"' : ''}>
             <span class="wbox-unit">${ex.perHand ? 'kg/m' : 'kg'}</span>
             <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx},${week})">✓</button>
@@ -857,7 +857,9 @@ function renderRoutine(dayIdx, week) {
 function saveWeightOverride(key, exIdx, dayIdx, week) {
   const input = document.getElementById('wi-' + key);
   if (!input) return;
-  const newWeight = parseFloat(input.value);
+  // Accept comma as decimal separator (iOS keyboards)
+  const rawVal = input.value.replace(',', '.');
+  const newWeight = parseFloat(rawVal);
   if (isNaN(newWeight) || newWeight <= 0) return;
 
   // Find exercise
@@ -867,9 +869,12 @@ function saveWeightOverride(key, exIdx, dayIdx, week) {
   customBase[key] = Math.round(newBase * 10) / 10;
   save('forja_customBase', customBase);
 
-  // Update "next week" display
+  // Update "next week" display — now calcKg uses the updated customBase
   const nextEl = document.getElementById('wn-' + dayIdx + '-' + exIdx);
-  if (nextEl) nextEl.textContent = fmtNext({ ...ex, baseKg: newBase }, week);
+  if (nextEl) nextEl.textContent = fmtNext(ex, week);
+
+  // Update current weight display to normalised value
+  input.value = String(newWeight).replace('.', ',');
 
   // Flash confirmation
   const btn = input.nextElementSibling.nextElementSibling;
@@ -925,12 +930,17 @@ function rtnChangeWeek(delta) {
 // ══════════════════════════════════════════════
 // SETTINGS
 // ══════════════════════════════════════════════
+// Helper: parse field that may use comma or dot as decimal separator
+function parseField(id) {
+  return parseFloat(document.getElementById(id).value.replace(',', '.'));
+}
+
 function openSettings() {
-  // Populate inputs
-  document.getElementById('inputWeight').value  = profile.weight;
-  document.getElementById('inputFat').value     = profile.fat;
-  document.getElementById('inputMuscle').value  = profile.muscle;
-  document.getElementById('inputHeight').value  = profile.height;
+  // Populate inputs — display with comma as decimal separator
+  document.getElementById('inputWeight').value  = String(profile.weight).replace('.', ',');
+  document.getElementById('inputFat').value     = String(profile.fat).replace('.', ',');
+  document.getElementById('inputMuscle').value  = String(profile.muscle).replace('.', ',');
+  document.getElementById('inputHeight').value  = String(profile.height).replace('.', ',');
 
   // Body log table
   renderLog();
@@ -948,10 +958,10 @@ function closeSettings() {
 }
 
 function saveProfile() {
-  const newWeight  = parseFloat(document.getElementById('inputWeight').value);
-  const newFat     = parseFloat(document.getElementById('inputFat').value);
-  const newMuscle  = parseFloat(document.getElementById('inputMuscle').value);
-  const newHeight  = parseFloat(document.getElementById('inputHeight').value);
+  const newWeight  = parseField('inputWeight');
+  const newFat     = parseField('inputFat');
+  const newMuscle  = parseField('inputMuscle');
+  const newHeight  = parseField('inputHeight');
 
   if ([newWeight, newFat, newMuscle, newHeight].some(isNaN)) {
     alert('Por favor completa todos los campos correctamente.'); return;
