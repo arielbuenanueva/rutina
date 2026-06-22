@@ -827,7 +827,7 @@ function renderRoutine(dayIdx, week) {
               value="${w !== null ? String(w).replace('.', ',') : ''}"
               ${ex.bodyweight ? 'disabled placeholder="—"' : ''}>
             <span class="wbox-unit">${ex.perHand ? 'kg/m' : 'kg'}</span>
-            <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx},${week})">✓</button>
+            <button class="wbox-save" onclick="saveWeightOverride('${ex.key}',${idx},${dayIdx})">✓</button>
           </div>
         </div>
         <div class="wbox-cell">
@@ -854,7 +854,9 @@ function renderRoutine(dayIdx, week) {
 // we back-calculate what the baseKg should be
 // so that the progression is preserved correctly
 // ══════════════════════════════════════════════
-function saveWeightOverride(key, exIdx, dayIdx, week) {
+function saveWeightOverride(key, exIdx, dayIdx) {
+  // Always use currentWeek — not a stale value baked at render time
+  const week = currentWeek;
   const input = document.getElementById('wi-' + key);
   if (!input) return;
   // Accept comma as decimal separator (iOS keyboards)
@@ -864,21 +866,22 @@ function saveWeightOverride(key, exIdx, dayIdx, week) {
 
   // Find exercise
   const ex = DAYS[dayIdx].exercises[exIdx];
-  // Back-calculate base: newWeight = base + stepKg*(week-1)
+  // Back-calculate the base so that: base + stepKg*(week-1) = newWeight
   const newBase = newWeight - ex.stepKg * (week - 1);
   customBase[key] = Math.round(newBase * 10) / 10;
   save('forja_customBase', customBase);
 
-  // Update "next week" display — now calcKg uses the updated customBase
-  const nextEl = document.getElementById('wn-' + dayIdx + '-' + exIdx);
-  if (nextEl) nextEl.textContent = fmtNext(ex, week);
+  // Re-render the whole routine so every cell (current + next + all weeks) is correct
+  renderRoutine(dayIdx, week);
 
-  // Update current weight display to normalised value
-  input.value = String(newWeight).replace('.', ',');
-
-  // Flash confirmation
-  const btn = input.nextElementSibling.nextElementSibling;
-  if (btn) { btn.textContent = '✅'; setTimeout(() => { btn.textContent = '✓'; }, 1200); }
+  // Flash the save button — query after re-render so DOM is fresh
+  setTimeout(() => {
+    const savedInput = document.getElementById('wi-' + key);
+    if (savedInput) {
+      const saveBtn = savedInput.parentElement.querySelector('.wbox-save');
+      if (saveBtn) { saveBtn.textContent = '✅'; setTimeout(() => { saveBtn.textContent = '✓'; }, 1400); }
+    }
+  }, 0);
 }
 
 // ══════════════════════════════════════════════
