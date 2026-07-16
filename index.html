@@ -470,80 +470,87 @@ function storageSet(key, val) {
 }
 
 // ══════════════════════════════════════════════
-// DAYS — 5 fixed days, 6 exercises each
-// Each exercise has a unique key used for weight storage
+// DAYS
+// Division: 2 muscle groups per day, 6 exercises
+// Day 1: Pecho + Triceps
+// Day 2: Espalda + Biceps
+// Day 3: Cuadriceps + Hombros
+// Day 4: Posterior (Isquios/Gluteo) + Core
+// Day 5: Pecho + Espalda (fuerza pura, compuestos pesados)
 // ══════════════════════════════════════════════
 var DAYS = [
   {
     id: 1, name: "Día 1", color: "#E8FF47",
-    focus: "Sentadilla · Jalones · Banca · Press Mil. · Curl · Polea",
+    focus: "Pecho + Tríceps",
     exercises: [
-      { key: "d1_squat",    group: "Piernas",  name: "Sentadilla con Barra Alta",          badge: "Cuádriceps · Glúteo",         sets: 4, reps: "5–6",   rest: "3 min",   tip: "Baja hasta paralelo mínimo. Rodillas alineadas con los pies." },
-      { key: "d1_latpull",  group: "Espalda",  name: "Jalones al Pecho (Polea Alta)",       badge: "Dorsal ancho",                sets: 4, reps: "8–10",  rest: "2 min",   tip: "Lleva la barra al esternón. Codos hacia el suelo. Baja controlado." },
-      { key: "d1_bench",    group: "Pecho",    name: "Press de Banca con Barra",            badge: "Pectoral mayor",              sets: 4, reps: "5–6",   rest: "3 min",   tip: "Omóplatos retraídos, pies planos. Baja en 2–3 seg. Empuje explosivo." },
-      { key: "d1_ohp",      group: "Hombros",  name: "Press Militar con Barra (de pie)",    badge: "Deltoides anterior",          sets: 4, reps: "6–8",   rest: "2 min",   tip: "Core apretado, sin arquear la espalda. Empuje vertical estricto." },
-      { key: "d1_curlEZ",   group: "Bíceps",   name: "Curl con Barra EZ",                  badge: "Bíceps braquial",             sets: 3, reps: "10–12", rest: "90 seg",  tip: "Codos fijos al cuerpo. Sube hasta 90° y aprieta arriba." },
-      { key: "d1_triRope",  group: "Tríceps",  name: "Extensiones en Polea Alta (Cuerda)", badge: "Tríceps (3 cabezas)",         sets: 3, reps: "12–15", rest: "90 seg",  tip: "Codo fijo. Separa la cuerda al final para activar las 3 cabezas." }
+      { key: "d1_bench",    group: "Pecho",    name: "Press de Banca con Barra",           badge: "Pectoral mayor",         sets: 5, reps: "3–5",   rest: "3 min",   tip: "Movimiento principal de fuerza. Omóplatos retraídos, pies planos. Baja controlado 2–3 seg, empuje explosivo." },
+      { key: "d1_inclineB", group: "Pecho",    name: "Press Inclinado con Barra",          badge: "Pecho superior",         sets: 4, reps: "6–8",   rest: "2–3 min", tip: "Banco a 30°. Codos a 75°. Baja hasta el pecho superior. Complementa la banca plana." },
+      { key: "d1_pecDeck",  group: "Pecho",    name: "Aperturas en Pec Deck (Mariposa)",   badge: "Pectoral (aislamiento)", sets: 3, reps: "10–12", rest: "90 seg",  tip: "Contracción máxima al cerrar. Baja lento controlando el estiramiento. No sueltes la tensión." },
+      { key: "d1_cgbench",  group: "Tríceps",  name: "Press de Banca Agarre Cerrado",      badge: "Tríceps · Pecho",        sets: 4, reps: "6–8",   rest: "2 min",   tip: "Agarre a la anchura de los hombros. Codos pegados al cuerpo. Gran ejercicio compuesto para tríceps." },
+      { key: "d1_frenchEZ", group: "Tríceps",  name: "Press Francés con Barra EZ",         badge: "Cabeza larga tríceps",   sets: 3, reps: "8–10",  rest: "90 seg",  tip: "Codos apuntan al techo sin abrirlos. Baja la barra hasta la frente. Extiende completamente." },
+      { key: "d1_triRope",  group: "Tríceps",  name: "Extensiones en Polea (Cuerda)",      badge: "Tríceps (3 cabezas)",    sets: 3, reps: "12–15", rest: "60 seg",  tip: "Codo fijo al cuerpo. Separa la cuerda al final para activar las 3 cabezas. Finalizador." }
     ]
   },
   {
     id: 2, name: "Día 2", color: "#47FFCB",
-    focus: "P. Muerto Rum. · Remo Barra · P. Inclinado · Arnold · Martillo · P. Francés",
+    focus: "Espalda + Bíceps",
     exercises: [
-      { key: "d2_rdl",      group: "Piernas",  name: "Peso Muerto Rumano (Barra)",          badge: "Isquios · Glúteo · Lumbar",   sets: 4, reps: "5–6",   rest: "3–4 min", tip: "Espalda neutral siempre. Caderas atrás, barra roza las piernas." },
-      { key: "d2_rowBar",   group: "Espalda",  name: "Remo con Barra (Pendlay)",            badge: "Dorsal · Romboides",          sets: 4, reps: "6–8",   rest: "2–3 min", tip: "Torso a 45°. Tira al ombligo retrayendo escápulas." },
-      { key: "d2_inclineDB",group: "Pecho",    name: "Press Inclinado con Mancuernas",      badge: "Pecho superior",              sets: 4, reps: "8–10",  rest: "2 min",   tip: "Banco a 30–45°. Codos a 75°. Rango completo. Peso por mano." },
-      { key: "d2_arnold",   group: "Hombros",  name: "Press Arnold con Mancuernas",         badge: "Deltoides 3 cabezas",         sets: 3, reps: "10–12", rest: "90 seg",  tip: "Empieza con palmas hacia ti, gira al subir. Peso por mano." },
-      { key: "d2_hammer",   group: "Bíceps",   name: "Curl Martillo con Mancuernas",        badge: "Bíceps · Braquial",           sets: 3, reps: "10–12", rest: "90 seg",  tip: "Agarre neutro. Activa el braquial. Peso por mano." },
-      { key: "d2_frenchEZ", group: "Tríceps",  name: "Press Francés con Barra EZ",         badge: "Cabeza larga tríceps",        sets: 3, reps: "8–10",  rest: "90 seg",  tip: "Codos apuntan al techo sin abrirlos. Baja la barra a la frente." }
+      { key: "d2_deadlift", group: "Espalda",  name: "Peso Muerto Convencional",           badge: "Espalda · Cadena post.", sets: 5, reps: "3–5",   rest: "4 min",   tip: "El rey de la fuerza de espalda. Barra sobre el empeine, espalda neutral, empuja el suelo. Usa cinturón a partir de pesos altos." },
+      { key: "d2_rowBar",   group: "Espalda",  name: "Remo con Barra (Pendlay)",           badge: "Dorsal · Romboides",     sets: 4, reps: "6–8",   rest: "2–3 min", tip: "Torso casi paralelo al suelo. La barra parte del suelo cada rep. Tira al ombligo retrayendo escápulas." },
+      { key: "d2_latpull",  group: "Espalda",  name: "Jalones al Pecho (Polea Alta)",      badge: "Dorsal ancho",           sets: 4, reps: "8–10",  rest: "2 min",   tip: "Lleva la barra al esternón. Codos hacia el suelo en la contracción. Baja controlado." },
+      { key: "d2_curlEZ",   group: "Bíceps",   name: "Curl con Barra EZ",                 badge: "Bíceps braquial",        sets: 4, reps: "6–8",   rest: "90 seg",  tip: "Codos fijos al cuerpo. Sube hasta 90°+ y aprieta 1 seg arriba. Baja sin soltar la tensión." },
+      { key: "d2_hammer",   group: "Bíceps",   name: "Curl Martillo con Mancuernas",       badge: "Bíceps · Braquial",      sets: 3, reps: "10–12", rest: "90 seg",  tip: "Agarre neutro. Activa el braquial además del bíceps. Alterna brazos. Peso por mano." },
+      { key: "d2_curlCable",group: "Bíceps",   name: "Curl en Polea Baja",                badge: "Bíceps (tensión total)", sets: 3, reps: "12–15", rest: "60 seg",  tip: "La polea mantiene tensión en toda la trayectoria. Finalizador ideal para bombeo y volumen." }
     ]
   },
   {
     id: 3, name: "Día 3", color: "#C084FC",
-    focus: "Hip Thrust · Remo Cable · P. Banca Manc. · Elev. Laterales · Curl Polea · Fondos",
+    focus: "Cuádriceps + Hombros",
     exercises: [
-      { key: "d3_hipThrust",group: "Piernas",  name: "Hip Thrust con Barra",               badge: "Glúteo mayor",                sets: 4, reps: "8–10",  rest: "2 min",   tip: "Espalda apoyada en banco. Cadera al nivel del torso. Aprieta el glúteo 1 seg." },
-      { key: "d3_rowCable", group: "Espalda",  name: "Remo en Polea Baja (Cable)",          badge: "Dorsal · Trapecio",           sets: 4, reps: "10–12", rest: "2 min",   tip: "Espalda recta, tira hacia el ombligo. Retrae escápulas en contracción." },
-      { key: "d3_benchDB",  group: "Pecho",    name: "Press de Banca con Mancuernas",       badge: "Pectoral mayor",              sets: 4, reps: "8–10",  rest: "2 min",   tip: "Mayor rango que con barra. Baja hasta que codos queden bajo el banco. Peso por mano." },
-      { key: "d3_lateral",  group: "Hombros",  name: "Elevaciones Laterales con Mancuernas",badge: "Deltoides medial",           sets: 4, reps: "12–15", rest: "90 seg",  tip: "Codos ligeramente doblados. Sube hasta paralelo. Baja en 3 seg. Peso por mano." },
-      { key: "d3_curlCable",group: "Bíceps",   name: "Curl en Polea Baja",                 badge: "Bíceps (tensión constante)",  sets: 3, reps: "12–15", rest: "90 seg",  tip: "La polea mantiene tensión en toda la trayectoria. Ideal para volumen." },
-      { key: "d3_dips",     group: "Tríceps",  name: "Fondos en Paralelas (Tríceps)",       badge: "Tríceps · Deltoides",         sets: 3, reps: "10–12", rest: "2 min",   tip: "Cuerpo erguido para aislar el tríceps. Baja hasta 90° de codo." }
+      { key: "d3_squat",    group: "Cuádriceps",name: "Sentadilla con Barra Alta",         badge: "Cuád · Glúteo",          sets: 5, reps: "3–5",   rest: "3–4 min", tip: "El ejercicio de fuerza de piernas por excelencia. Baja hasta paralelo mínimo. Rodillas alineadas con los pies." },
+      { key: "d3_legPress", group: "Cuádriceps",name: "Prensa de Piernas 45°",             badge: "Cuádriceps · Glúteo",    sets: 4, reps: "8–10",  rest: "2 min",   tip: "Pies a anchura de caderas. Baja lento 3 seg. No bloquees completamente las rodillas arriba." },
+      { key: "d3_legExt",   group: "Cuádriceps",name: "Extensión de Cuádriceps (Máquina)", badge: "Cuádriceps (aislamiento)",sets: 3, reps: "12–15", rest: "90 seg",  tip: "Extensión completa, contrae el cuádriceps 1 seg arriba. Baja controlado sin soltar el peso." },
+      { key: "d3_ohp",      group: "Hombros",   name: "Press Militar con Barra (de pie)",  badge: "Deltoides anterior",     sets: 4, reps: "5–7",   rest: "2–3 min", tip: "Compuesto pesado de hombros. Core apretado, sin arquear la espalda. Empuje vertical estricto." },
+      { key: "d3_arnold",   group: "Hombros",   name: "Press Arnold con Mancuernas",       badge: "Deltoides 3 cabezas",    sets: 3, reps: "10–12", rest: "90 seg",  tip: "Empieza con palmas hacia ti, gira al subir hasta pronación. Cubre todo el arco del deltoides. Peso por mano." },
+      { key: "d3_lateral",  group: "Hombros",   name: "Elevaciones Laterales con Mancuernas",badge: "Deltoides medial",     sets: 4, reps: "12–15", rest: "60 seg",  tip: "Codos ligeramente doblados. Sube hasta paralelo. Baja en 3 seg. Sin impulso de cintura. Peso por mano." }
     ]
   },
   {
     id: 4, name: "Día 4", color: "#FF8C47",
-    focus: "Prensa · Jalón Cerrado · P. Inclinado Barra · Vuelos Post. · Curl Conc. · Patada",
+    focus: "Isquios · Glúteo + Core",
     exercises: [
-      { key: "d4_legPress", group: "Piernas",  name: "Prensa de Piernas 45°",              badge: "Cuádriceps · Glúteo",         sets: 4, reps: "8–10",  rest: "2–3 min", tip: "Pies a anchura de caderas. Baja lento 3 seg. No bloquees las rodillas arriba." },
-      { key: "d4_latClose", group: "Espalda",  name: "Jalones Agarre Cerrado Neutro",       badge: "Dorsal · Bíceps",             sets: 4, reps: "8–10",  rest: "2 min",   tip: "Agarre neutro cerrado. Codos pegados al cuerpo al bajar." },
-      { key: "d4_inclineB", group: "Pecho",    name: "Press Inclinado con Barra",           badge: "Pecho superior · Deltoides",  sets: 4, reps: "6–8",   rest: "2–3 min", tip: "Banco a 30°. Codos a 75°. Baja hasta el pecho superior." },
-      { key: "d4_rearDelt", group: "Hombros",  name: "Vuelos Posteriores con Mancuernas",  badge: "Deltoides posterior",         sets: 4, reps: "12–15", rest: "90 seg",  tip: "Torso inclinado 45°. Abre los brazos como alas. Peso por mano." },
-      { key: "d4_curlConc", group: "Bíceps",   name: "Curl Concentrado con Mancuerna",     badge: "Bíceps (pico)",               sets: 3, reps: "10–12", rest: "90 seg",  tip: "Codo apoyado en la rodilla. Máximo aislamiento. Peso por mano." },
-      { key: "d4_kickback", group: "Tríceps",  name: "Patada de Tríceps con Mancuerna",    badge: "Cabeza lateral tríceps",      sets: 3, reps: "12–15", rest: "90 seg",  tip: "Torso paralelo al suelo. Codo fijo a 90°, extiende hacia atrás. Peso por mano." }
+      { key: "d4_rdl",      group: "Posterior", name: "Peso Muerto Rumano (Barra)",        badge: "Isquios · Glúteo",       sets: 4, reps: "5–7",   rest: "3 min",   tip: "Caderas atrás, barra roza las piernas. Espalda neutral siempre. Pausa 1 seg abajo para máxima activación." },
+      { key: "d4_legCurl",  group: "Posterior", name: "Curl Femoral Tumbado (Máquina)",    badge: "Isquiotibiales",         sets: 4, reps: "8–10",  rest: "90 seg",  tip: "Caderas pegadas al banco. Curla hasta 90°+. Baja lento controlando la fase excéntrica." },
+      { key: "d4_sumo",     group: "Posterior", name: "Sentadilla Sumo con Mancuerna",     badge: "Glúteo · Aductores",     sets: 4, reps: "10–12", rest: "90 seg",  tip: "Pies amplios, puntas afuera 45°. Baja profundo. Gran activación de glúteo y aductores. Sujeta la mancuerna colgando." },
+      { key: "d4_plank",    group: "Core",      name: "Plancha Frontal Isométrica",        badge: "Core · Transverso",      sets: 4, reps: "40 seg",rest: "45 seg",  tip: "Cuerpo recto de cabeza a talones. Aprieta glúteos y abdomen. Sin caer la cadera." },
+      { key: "d4_abWheel",  group: "Core",      name: "Rueda Abdominal",                   badge: "Core completo",          sets: 3, reps: "8–10",  rest: "60 seg",  tip: "Extiende sin arquear la zona lumbar. Si no aguantás la forma, hacelo desde las rodillas." },
+      { key: "d4_pallof",   group: "Core",      name: "Pallof Press en Polea",             badge: "Core anti-rotación",     sets: 3, reps: "10 c/lado",rest: "60 seg",tip: "Parado lateral a la polea. Empuja y regresa sin rotar el tronco. Entrena estabilidad real del core." }
     ]
   },
   {
     id: 5, name: "Día 5", color: "#FF4791",
-    focus: "P.M. Sumo · Remo Barra · Banca · Elev.+Vuelos SS · Curl EZ · P. Francés",
+    focus: "Pecho + Espalda (Fuerza pura)",
     exercises: [
-      { key: "d5_sumo",     group: "Piernas",  name: "Peso Muerto Sumo",                   badge: "Glúteo · Isquios · Aductores",sets: 4, reps: "6–8",   rest: "3 min",   tip: "Pies amplios, puntas afuera. Barra sobre el empeine. Empuja el suelo afuera al subir." },
-      { key: "d5_rowBar",   group: "Espalda",  name: "Remo con Barra (Pendlay)",            badge: "Dorsal · Romboides",          sets: 4, reps: "6–8",   rest: "2–3 min", tip: "La barra parte del suelo cada rep. Tira explosivo, retrae escápulas." },
-      { key: "d5_bench",    group: "Pecho",    name: "Press de Banca con Barra",            badge: "Pectoral mayor",              sets: 4, reps: "5–6",   rest: "3 min",   tip: "Omóplatos retraídos, pies planos. Bajada controlada. Empuje explosivo." },
-      { key: "d5_superSh",  group: "Hombros",  name: "Elevaciones Lat. + Vuelos Post. (SS)",badge: "Deltoides medial + posterior",sets: 3, reps: "12+12", rest: "2 min",   tip: "Sin descanso entre A y B. A) Elevaciones laterales 12 reps, B) Vuelos posteriores 12 reps." },
-      { key: "d5_curlEZ",   group: "Bíceps",   name: "Curl con Barra EZ",                  badge: "Bíceps braquial",             sets: 3, reps: "10–12", rest: "90 seg",  tip: "Tempo 2-1-3: sube 2 seg, aprieta 1 seg, baja 3 seg." },
-      { key: "d5_french",   group: "Tríceps",  name: "Press Francés con Barra EZ",         badge: "Tríceps completo",            sets: 3, reps: "8–10",  rest: "90 seg",  tip: "Codos apuntan al techo sin abrirlos. Baja controlado, extiende completamente." }
+      { key: "d5_bench",    group: "Pecho",    name: "Press de Banca con Barra",           badge: "Pectoral mayor",         sets: 5, reps: "3–5",   rest: "3–4 min", tip: "Día de fuerza máxima. Usa el mayor peso posible con buena técnica. Descanso completo entre series." },
+      { key: "d5_inclineDB",group: "Pecho",    name: "Press Inclinado con Mancuernas",     badge: "Pecho superior",         sets: 4, reps: "8–10",  rest: "2 min",   tip: "Banco a 30–45°. Codos a 75°. Rango completo. Mayor estiramiento que con barra. Peso por mano." },
+      { key: "d5_deadlift", group: "Espalda",  name: "Peso Muerto Convencional",           badge: "Espalda · Cadena post.", sets: 5, reps: "3–5",   rest: "4 min",   tip: "Día de fuerza máxima. Concentrá toda la energía. Barra sobre el empeine, espalda neutral, empuja el suelo." },
+      { key: "d5_rowBar",   group: "Espalda",  name: "Remo con Barra (Pendlay)",           badge: "Dorsal · Romboides",     sets: 4, reps: "6–8",   rest: "2–3 min", tip: "Torso casi paralelo al suelo. La barra parte del suelo cada rep. Retrae escápulas en la contracción." },
+      { key: "d5_latClose", group: "Espalda",  name: "Jalones Agarre Cerrado Neutro",      badge: "Dorsal · Bíceps",        sets: 3, reps: "10–12", rest: "90 seg",  tip: "Agarre neutro cerrado. Codos pegados al cuerpo al bajar. Activación diferente al agarre ancho." },
+      { key: "d5_rearDelt", group: "Espalda",  name: "Vuelos Posteriores (Mancuernas)",    badge: "Deltoides posterior",    sets: 3, reps: "12–15", rest: "60 seg",  tip: "Torso inclinado 45°. Abre los brazos como alas. Equilibra el deltoides y protege el manguito. Peso por mano." }
     ]
   }
 ];
-
 // Group icon map
 var GROUP_ICONS = {
-  "Piernas": "🦵",
-  "Espalda": "🔙",
-  "Pecho":   "🏋️",
-  "Hombros": "💛",
-  "Bíceps":  "💪",
-  "Tríceps": "🦾"
+  "Piernas":    "🦵",
+  "Cuádriceps": "🦵",
+  "Posterior":  "🍑",
+  "Espalda":    "🔙",
+  "Pecho":      "🏋️",
+  "Hombros":    "💛",
+  "Bíceps":     "💪",
+  "Tríceps":    "🦾",
+  "Core":       "⬛"
 };
 
 // ══════════════════════════════════════════════
